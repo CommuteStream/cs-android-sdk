@@ -12,7 +12,7 @@ public class RestClient {
     private static AsyncHttpClient client = new AsyncHttpClient();
 
     public static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-    	Log.v("CS_SDK", "FETCHING: " + getAbsoluteUrl(url));
+    	Log.v("CS_SDK", "GET: " + getAbsoluteUrl(url));
         client.get(getAbsoluteUrl(url), params, responseHandler);
     }
 

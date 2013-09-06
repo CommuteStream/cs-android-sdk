@@ -1,12 +1,14 @@
 package com.commutestreamsdk;
 
 import android.app.Application;
+import android.util.Log;
 
 public class MyLibrary extends Application {
 	private static String lib_name;
 	private static String lib_versionName;
 	private static String app_name;
 	private static String app_versionName;
+	private static boolean initialized;
 
     public void onCreate(){
     }
@@ -41,6 +43,14 @@ public class MyLibrary extends Application {
 
 	public static void setLibName(String lib_name) {
 		MyLibrary.lib_name = lib_name;
+	}
+
+	public static boolean isInitialized() {
+		return initialized;
+	}
+
+	public static void setInitialized(boolean initialized) {
+		MyLibrary.initialized = initialized;
 	}
 
 
