@@ -1,4 +1,4 @@
-package com.CommuteStreamSDK;
+package com.commutestreamsdk;
 
 import java.util.Date;
 
