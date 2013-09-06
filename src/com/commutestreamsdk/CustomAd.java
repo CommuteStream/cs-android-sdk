@@ -18,6 +18,7 @@ import android.widget.RelativeLayout;
 import android.content.pm.PackageManager.NameNotFoundException;
 
 import com.commutestreamsdk.http.JsonHttpResponseHandler;
+import com.commutestreamsdk.http.RequestParams;
 import com.commutestreamsdk.R;
 import com.google.ads.Ad;
 import com.google.ads.AdListener;
@@ -66,9 +67,14 @@ public class CustomAd implements CustomEventBanner, AdListener {
 			Log.v("CS_SDK", "LAT: " + request.getLocation().getLatitude());
 		}
 		Log.v("CS_SDK", ((CustomAdParameters) customEventExtra).getAgency());
+		
+		//RequestParams params = new RequestParams();
+		//params.put("agency_id", ((CustomAdParameters) customEventExtra).getAgency());
+
+		RequestParams params = ((CustomAdParameters) customEventExtra).getHttpParams();
 
 		// attempt to "fetch" an item from the server
-		RestClient.get("fetch", null, new JsonHttpResponseHandler() {
+		RestClient.get("fetch", params, new JsonHttpResponseHandler() {
 
 			@Override
 			public void onSuccess(JSONObject response) {
@@ -117,7 +123,13 @@ public class CustomAd implements CustomEventBanner, AdListener {
 						if (lastParameterChangeTime.getTime() > lastServerRequestTime
 								.getTime()) {
 							Log.v("CS_SDK", "UPDATE THE SERVER!");
-							RestClient.get("fetch", null,
+							
+							//RequestParams params = new RequestParams();
+							//params.put("agency_id", ((CustomAdParameters) customEventExtra).getAgency());
+							//params.put("agency_id", "NONO");
+							RequestParams params = ((CustomAdParameters) customEventExtra).getHttpParams();
+							
+							RestClient.get("fetch", params,
 									new JsonHttpResponseHandler() {
 										@Override
 										public void onSuccess(
