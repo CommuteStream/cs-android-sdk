@@ -1,5 +1,5 @@
 <resources>
-
     <string name="app_name">CommuteStream SDK</string>
+    <string name="app_versionName">0.0.1</string>
 
 </resources>
