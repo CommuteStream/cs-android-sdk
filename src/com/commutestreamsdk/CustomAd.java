@@ -41,7 +41,8 @@ public class CustomAd implements CustomEventBanner, AdListener {
 	private Date lastServerRequestTime = new Date();
 	private RequestParams params;
 	private String app_version;
-	private String sdk_version;
+	
+	private static final String SDK_VERSION = "0.0.1";
 
 	// Called when AdMob requests a CommuteStream Ad
 	@Override
@@ -72,24 +73,18 @@ public class CustomAd implements CustomEventBanner, AdListener {
 				e2.printStackTrace();
 			}
 
-			sdk_version = activity.getString(R.string.app_versionName);
-
 			// set the the parameter specified in AdMob
-			customAdParameters.setAdvertiser_id(serverParameter);
-			customAdParameters.setBanner_height(Integer.toString(adSize
-					.getHeightInPixels(activity)));
-			customAdParameters.setBanner_width(Integer.toString(adSize
-					.getWidthInPixels(activity)));
+			customAdParameters.setCs_uuid(serverParameter);
 
-			customAdParameters.setHost_app_ver(app_version);
-			customAdParameters.setSdk_ver(sdk_version);
+			customAdParameters.setApp_ver(app_version);
+			customAdParameters.setSdk_ver(SDK_VERSION);
 
 			customAdParameters.setAid_sha(getAndroidIDHash(activity, "SHA1"));
 			customAdParameters.setAid_md5(getAndroidIDHash(activity, "MD5"));
 
 			// set App/Lib version info in MyLibrary
 			MyLibrary.setLibName("com.commutestreamsdk");
-			MyLibrary.setLibVersionName(sdk_version);
+			MyLibrary.setLibVersionName(SDK_VERSION);
 			MyLibrary.setAppName(activity.getPackageName());
 			MyLibrary.setAppVersionName(app_version);
 			
@@ -97,9 +92,14 @@ public class CustomAd implements CustomEventBanner, AdListener {
 			MyLibrary.setInitialized(true);
 		}
 
+		customAdParameters.setBanner_height(Integer.toString(adSize
+				.getHeightInPixels(activity)));
+		customAdParameters.setBanner_width(Integer.toString(adSize
+				.getWidthInPixels(activity)));
+
 		// get parameters
 		params = customAdParameters.getHttpParams();
-		params.put("requesting_item", "true");
+		params.put("skip_fetch", "false");
 
 		// attempt to "fetch" an item from the server
 		RestClient.get("fetch", params, new JsonHttpResponseHandler() {
@@ -107,14 +107,14 @@ public class CustomAd implements CustomEventBanner, AdListener {
 			@Override
 			public void onSuccess(JSONObject response) {
 				try {
-					// String fetch_id = response.getString("fetch_id");
+					// String fetch_uuid = response.getString("fetch_uuid");
 					String html = response.getString("html");
 					String url = response.getString("url");
-					Boolean display_item = response.getBoolean("display_item");
+					Boolean item_returned = response.getBoolean("item_returned");
 
 					// if there is something that the server wants us to display
 					// we generate a webview for it and pass it on to admob
-					if (display_item) {
+					if (item_returned) {
 						adView = generateWebView(listener, activity, label,
 								serverParameter, adSize, request,
 								customEventExtra, html, url);
@@ -156,7 +156,7 @@ public class CustomAd implements CustomEventBanner, AdListener {
 							// get the parameters
 							params = ((CustomAdParameters) customEventExtra)
 									.getHttpParams();
-							params.put("requesting_item", "false");
+							params.put("skip_fetch", "true");
 
 							RestClient.get("fetch", params,
 									new JsonHttpResponseHandler() {

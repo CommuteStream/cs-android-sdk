@@ -8,11 +8,11 @@ import android.location.Location;
 import android.util.Log;
 
 public class CustomAdParameters {
-	private String advertiser_id;
+	private String cs_uuid;
 	private String banner_height;
 	private String banner_width;
 	private String sdk_ver;
-	private String host_app_ver;
+	private String app_ver;
 	private String agency_id;
 	private String stop_id;
 	private String route_id;
@@ -72,13 +72,13 @@ public class CustomAdParameters {
 		return http_params;
 	}
 
-	public String getAdvertiser_id() {
-		return advertiser_id;
+	public String getCs_uuid_uuid() {
+		return cs_uuid;
 	}
 
-	public void setAdvertiser_id(String advertiser_id) {
-		this.advertiser_id = advertiser_id;
-		http_params.put("advertiser_id", advertiser_id);
+	public void setCs_uuid(String cs_uuid) {
+		this.cs_uuid = cs_uuid;
+		http_params.put("cs_uuid", cs_uuid);
 	}
 
 	public String getBanner_height() {
@@ -99,13 +99,13 @@ public class CustomAdParameters {
 		http_params.put("banner_width", banner_width);
 	}
 
-	public String getHost_app_ver() {
-		return host_app_ver;
+	public String getApp_ver() {
+		return app_ver;
 	}
 
-	public void setHost_app_ver(String host_app_ver) {
-		this.host_app_ver = host_app_ver;
-		http_params.put("host_app_ver", host_app_ver);
+	public void setApp_ver(String app_ver) {
+		this.app_ver = app_ver;
+		http_params.put("app_ver", app_ver);
 	}
 
 	public String getSdk_ver() {
