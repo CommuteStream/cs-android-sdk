@@ -34,9 +34,12 @@ import com.google.ads.mediation.customevent.CustomEventBannerListener;
 public class CustomAd implements CustomEventBanner, AdListener {
 
 	private CustomEventBannerListener bannerListener;
-	private AdView adView;
+	private WebView adView;
 	private Timer parameterCheckTimer = new Timer();
 	private Date lastServerRequestTime = new Date();
+	private RequestParams params;
+	private String app_version;
+	private String sdk_version;
 
 	// Called when AdMob requests a CommuteStream Ad
 	@Override
@@ -45,18 +48,42 @@ public class CustomAd implements CustomEventBanner, AdListener {
 			final String serverParameter, final AdSize adSize,
 			final MediationAdRequest request, final Object customEventExtra) {
 
-		// set App/Lib version info in MyLibrary
-		MyLibrary.setLibName("com.commutestreamsdk");
-		MyLibrary.setLibVersionName(activity
-				.getString(R.string.app_versionName));
-		MyLibrary.setAppName(activity.getPackageName());
-		try {
-			MyLibrary.setAppVersionName(activity.getPackageManager()
-					.getPackageInfo(activity.getPackageName(), 0).versionName);
-		} catch (NameNotFoundException e1) {
-			e1.printStackTrace();
+		//typecast the customEventExtra object
+		CustomAdParameters customAdParameters = ((CustomAdParameters) customEventExtra);
+		
+		//if params havn't been initialized yet we want to set some of the 
+		//more static values on just the first call to requestBannerAd
+		if(params == null){
+			
+			// Keep the custom event listener for use later.
+		    this.bannerListener = listener;
+			
+			Log.v("CS_SDK", "Initializing Parameters");
+			params = customAdParameters.getHttpParams();
+			
+			//set the advertiser_id from the parameter specified in AdMob
+			customAdParameters.setAdvertiser_id(serverParameter);
+			customAdParameters.setBanner_height(Integer.toString(adSize.getHeightInPixels(activity)));
+			customAdParameters.setBanner_width(Integer.toString(adSize.getWidthInPixels(activity)));
+			try {
+				app_version = activity.getPackageManager().getPackageInfo(activity.getPackageName(), 0).versionName;
+			} catch (NameNotFoundException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
+			customAdParameters.setHost_app_ver(app_version);
+			customAdParameters.setSdk_ver(activity.getString(R.string.app_versionName));
+			
+			// set App/Lib version info in MyLibrary
+			MyLibrary.setLibName("com.commutestreamsdk");
+			MyLibrary.setLibVersionName(activity
+					.getString(R.string.app_versionName));
+			MyLibrary.setAppName(activity.getPackageName());
+			MyLibrary.setAppVersionName(app_version);
+			
+			//set aid
+			
 		}
-
 		// Location needs to:
 		// (1) be added to custom parameters so updates are tracked
 		// (2) untracked and simply pulled from request.getLocation
@@ -66,12 +93,13 @@ public class CustomAd implements CustomEventBanner, AdListener {
 		if (request.getLocation() != null) {
 			Log.v("CS_SDK", "LAT: " + request.getLocation().getLatitude());
 		}
-		Log.v("CS_SDK", ((CustomAdParameters) customEventExtra).getAgency());
+		Log.v("CS_SDK", customAdParameters.getAgency());
 		
 		//RequestParams params = new RequestParams();
-		//params.put("agency_id", ((CustomAdParameters) customEventExtra).getAgency());
+		//params.put("agency_id", customAdParameters.getAgency());
 
-		RequestParams params = ((CustomAdParameters) customEventExtra).getHttpParams();
+		RequestParams params = customAdParameters.getHttpParams();
+		params.put("requesting_item", "true");
 
 		// attempt to "fetch" an item from the server
 		RestClient.get("fetch", params, new JsonHttpResponseHandler() {
@@ -87,10 +115,10 @@ public class CustomAd implements CustomEventBanner, AdListener {
 					// if there is something that the server wants us to display
 					// we generate a webview for it and pass it on to admob
 					if (display_item) {
-						WebView webView = generateWebView(listener, activity,
+						adView = generateWebView(listener, activity,
 								label, serverParameter, adSize, request,
 								customEventExtra, html, url);
-						listener.onReceivedAd(webView);
+						listener.onReceivedAd(adView);
 					} else {
 						listener.onFailedToReceiveAd();
 					}
@@ -128,6 +156,7 @@ public class CustomAd implements CustomEventBanner, AdListener {
 							//params.put("agency_id", ((CustomAdParameters) customEventExtra).getAgency());
 							//params.put("agency_id", "NONO");
 							RequestParams params = ((CustomAdParameters) customEventExtra).getHttpParams();
+							params.put("requesting_item", "false");
 							
 							RestClient.get("fetch", params,
 									new JsonHttpResponseHandler() {
