@@ -37,8 +37,8 @@ public class CustomAd implements CustomEventBanner, AdListener {
 
 	private CustomEventBannerListener bannerListener;
 	private WebView adView;
-	private Timer parameterCheckTimer = new Timer();
-	private Date lastServerRequestTime = new Date();
+	//private Timer parameterCheckTimer = new Timer();
+	//private Date lastServerRequestTime = new Date();
 	private RequestParams params;
 	private String app_version;
 	
@@ -138,46 +138,6 @@ public class CustomAd implements CustomEventBanner, AdListener {
 			}
 		});
 
-		// Every few seconds we should check to see if the parameters have been
-		// updated since the last request to the server. If so we should send
-		// the new parameters to ensure the server has the latest user info
-		this.parameterCheckTimer.scheduleAtFixedRate(
-				new ParameterUpdateCheckTimer(this.lastServerRequestTime) {
-					@Override
-					public void run() {
-						// Log.v("CS_SDK", "parameterCheckTimer FIRED");
-
-						// check when the parameters were last updated
-						final Date lastParameterChangeTime = ((CustomAdParameters) customEventExtra)
-								.getLastParameterChangeTime();
-
-						if (lastParameterChangeTime.getTime() > lastServerRequestTime
-								.getTime()) {
-							Log.v("CS_SDK", "Updating the server.");
-
-							// get the parameters
-							params = ((CustomAdParameters) customEventExtra)
-									.getHttpParams();
-							params.put("skip_fetch", "true");
-
-							RestClient.get("banner", params,
-									new JsonHttpResponseHandler() {
-										@Override
-										public void onSuccess(
-												JSONObject response) {
-											lastServerRequestTime = lastParameterChangeTime;
-										}
-
-										@Override
-										public void onFailure(Throwable e,
-												JSONObject errorResponse) {
-											Log.v("CS_SDK", "UPDATE FAILED");
-										}
-									});
-						}
-					}
-				}, 2000, 2000);
-
 		// Log.v("CS_SDK", "End of requestBannerAd");
 	}
 
@@ -212,7 +172,10 @@ public class CustomAd implements CustomEventBanner, AdListener {
 		webView.setVerticalScrollBarEnabled(false);
 		webView.setHorizontalScrollBarEnabled(false);
 		webView.loadData(html, "text/html", null);
-		this.lastServerRequestTime = new Date();
+		
+		//update the time of the banner request
+		((CustomAdParameters) customEventExtra).setLastServerRequestTime(new Date());
+		
 		webView.setLayoutParams(new RelativeLayout.LayoutParams(adSize
 				.getWidthInPixels(activity), adSize.getHeightInPixels(activity)));
 		webView.setOnTouchListener(new OnTouchListener() {
@@ -241,8 +204,6 @@ public class CustomAd implements CustomEventBanner, AdListener {
 	@Override
 	public void destroy() {
 		// Clean up custom event variables.
-		this.parameterCheckTimer.cancel();
-		Log.v("CS_SDK", "parameterCheckTimer CANCELED");
 	}
 
 	@Override

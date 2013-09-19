@@ -1,7 +1,11 @@
 package com.commutestreamsdk;
 
 import java.util.Date;
+import java.util.Timer;
 
+import org.json.JSONObject;
+
+import com.commutestreamsdk.http.JsonHttpResponseHandler;
 import com.commutestreamsdk.http.RequestParams;
 
 import android.location.Location;
@@ -23,13 +27,54 @@ public class CustomAdParameters {
 	private String aid_sha;
 	private String aid_md5;
 	private String testing;
-	
+
 	private Location location;
-	
+
 	private Date lastParameterChange;
-	
+
+	private Timer parameterCheckTimer = new Timer();
+	private Date lastServerRequestTime = new Date();
+
 	RequestParams http_params = new RequestParams();
-	
+
+	public CustomAdParameters() {
+		Log.v("CS_SDK", "IN THE CustomAdParmeters Constructor");
+
+		// Every few seconds we should check to see if the parameters have been
+		// updated since the last request to the server. If so we should send
+		// the new parameters to ensure the server has the latest user info
+		this.parameterCheckTimer.scheduleAtFixedRate(
+				new ParameterUpdateCheckTimer(this.lastServerRequestTime) {
+					@Override
+					public void run() {
+						//Log.v("CS_SDK", "parameterCheckTimer FIRED");
+
+						if (lastParameterChange.getTime() > lastServerRequestTime
+								.getTime()) {
+							Log.v("CS_SDK", "Updating the server.");
+
+							http_params.put("skip_fetch", "true");
+
+							RestClient.get("banner", http_params,
+									new JsonHttpResponseHandler() {
+										@Override
+										public void onSuccess(
+												JSONObject response) {
+											lastServerRequestTime = lastParameterChange;
+										}
+
+										@Override
+										public void onFailure(Throwable e,
+												JSONObject errorResponse) {
+											Log.v("CS_SDK", "UPDATE FAILED");
+										}
+									});
+						}
+					}
+				}, 2000, 2000);
+
+	}
+
 	public void setAgency_id(String agency_id) {
 		Log.v("CS_SDK", "Agency changed to: " + agency_id);
 		this.agency_id = agency_id;
@@ -148,6 +193,10 @@ public class CustomAdParameters {
 		return aid_md5;
 	}
 
+	public void setLastServerRequestTime(Date date) {
+		lastServerRequestTime = date;
+	}
+
 	public void setAid_md5(String aid_md5) {
 		this.aid_md5 = aid_md5;
 		http_params.put("aid_md5", aid_md5);
@@ -161,7 +210,5 @@ public class CustomAdParameters {
 		this.testing = testing;
 		http_params.put("testing", testing);
 	}
-
-
 
 }
