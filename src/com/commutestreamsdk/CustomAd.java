@@ -42,6 +42,8 @@ public class CustomAd implements CustomEventBanner, AdListener {
 	private RequestParams params;
 	private String app_version;
 	
+	//We cannot package resources with the jar file and therefor
+	//cannot read the version from the xml
 	private static final String SDK_VERSION = "0.0.1";
 
 	// Called when AdMob requests a CommuteStream Ad
@@ -51,14 +53,14 @@ public class CustomAd implements CustomEventBanner, AdListener {
 			final String serverParameter, final AdSize adSize,
 			final MediationAdRequest request, final Object customEventExtra) {
 
-		// typecast the customEventExtra object
+		//typecast the customEventExtra object
 		CustomAdParameters customAdParameters = ((CustomAdParameters) customEventExtra);
 
 		// Keep the custom event listener for use later.
 		this.bannerListener = listener;
 
 		//Here we get and save some more persistent variables that we try to keep
-		//around for the life of the app, since this class is reinstantiatied
+		//around for the life of the app, since this class is reinstantiated
 		//with each ad retrieval by admob
 		if (!MyLibrary.isInitialized()) {
 
@@ -74,7 +76,7 @@ public class CustomAd implements CustomEventBanner, AdListener {
 			}
 
 			// set the the parameter specified in AdMob
-			customAdParameters.setCs_uuid(serverParameter);
+			customAdParameters.setAd_unit_uuid(serverParameter);
 
 			customAdParameters.setApp_ver(app_version);
 			customAdParameters.setSdk_ver(SDK_VERSION);
@@ -101,13 +103,13 @@ public class CustomAd implements CustomEventBanner, AdListener {
 		params = customAdParameters.getHttpParams();
 		params.put("skip_fetch", "false");
 
-		// attempt to "fetch" an item from the server
-		RestClient.get("fetch", params, new JsonHttpResponseHandler() {
+		// attempt to "banner" an item from the server
+		RestClient.get("banner", params, new JsonHttpResponseHandler() {
 
 			@Override
 			public void onSuccess(JSONObject response) {
 				try {
-					// String fetch_uuid = response.getString("fetch_uuid");
+					// String banner_request_uuid = response.getString("banner_request_uuid");
 					String html = response.getString("html");
 					String url = response.getString("url");
 					Boolean item_returned = response.getBoolean("item_returned");
@@ -158,7 +160,7 @@ public class CustomAd implements CustomEventBanner, AdListener {
 									.getHttpParams();
 							params.put("skip_fetch", "true");
 
-							RestClient.get("fetch", params,
+							RestClient.get("banner", params,
 									new JsonHttpResponseHandler() {
 										@Override
 										public void onSuccess(

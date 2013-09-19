@@ -8,7 +8,7 @@ import android.location.Location;
 import android.util.Log;
 
 public class CustomAdParameters {
-	private String cs_uuid;
+	private String ad_unit_uuid;
 	private String banner_height;
 	private String banner_width;
 	private String sdk_ver;
@@ -22,6 +22,7 @@ public class CustomAdParameters {
 	private String fix_time;
 	private String aid_sha;
 	private String aid_md5;
+	private String testing;
 	
 	private Location location;
 	
@@ -72,13 +73,13 @@ public class CustomAdParameters {
 		return http_params;
 	}
 
-	public String getCs_uuid_uuid() {
-		return cs_uuid;
+	public String getAd_unit_uuid() {
+		return ad_unit_uuid;
 	}
 
-	public void setCs_uuid(String cs_uuid) {
-		this.cs_uuid = cs_uuid;
-		http_params.put("cs_uuid", cs_uuid);
+	public void setAd_unit_uuid(String ad_unit_uuid) {
+		this.ad_unit_uuid = ad_unit_uuid;
+		http_params.put("ad_unit_uuid", ad_unit_uuid);
 	}
 
 	public String getBanner_height() {
@@ -150,6 +151,15 @@ public class CustomAdParameters {
 	public void setAid_md5(String aid_md5) {
 		this.aid_md5 = aid_md5;
 		http_params.put("aid_md5", aid_md5);
+	}
+
+	public String getTesting() {
+		return testing;
+	}
+
+	public void setTesting(String testing) {
+		this.testing = testing;
+		http_params.put("testing", testing);
 	}
 
 
