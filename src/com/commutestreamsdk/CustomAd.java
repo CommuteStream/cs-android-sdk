@@ -37,14 +37,14 @@ public class CustomAd implements CustomEventBanner, AdListener {
 
 	private CustomEventBannerListener bannerListener;
 	private WebView adView;
-	//private Timer parameterCheckTimer = new Timer();
-	//private Date lastServerRequestTime = new Date();
+	// private Timer parameterCheckTimer = new Timer();
+	// private Date lastServerRequestTime = new Date();
 	private RequestParams params;
 	private String app_version;
-	
-	//We cannot package resources with the jar file and therefor
-	//cannot read the version from the xml
-	private static final String SDK_VERSION = "0.0.1";
+
+	// We cannot package resources with the jar file and therefor
+	// cannot read the version from the xml
+	private static final String SDK_VERSION = "0.0.2";
 
 	// Called when AdMob requests a CommuteStream Ad
 	@Override
@@ -53,18 +53,14 @@ public class CustomAd implements CustomEventBanner, AdListener {
 			final String serverParameter, final AdSize adSize,
 			final MediationAdRequest request, final Object customEventExtra) {
 
-		//typecast the customEventExtra object
-		CustomAdParameters customAdParameters = ((CustomAdParameters) customEventExtra);
-
 		// Keep the custom event listener for use later.
 		this.bannerListener = listener;
 
-		//Here we get and save some more persistent variables that we try to keep
-		//around for the life of the app, since this class is reinstantiated
-		//with each ad retrieval by admob
+		// There are some things we need to get from the activity and AdMob on
+		// the first Banner Request
 		if (!MyLibrary.isInitialized()) {
 
-			Log.v("CS_SDK", "Initializing Parameters");
+			// Log.v("CS_SDK", "Initializing MyLibrary");
 
 			// Get the versionName of the app using this library
 			try {
@@ -76,67 +72,71 @@ public class CustomAd implements CustomEventBanner, AdListener {
 			}
 
 			// set the the parameter specified in AdMob
-			customAdParameters.setAd_unit_uuid(serverParameter);
+			MyLibrary.setAd_unit_uuid(serverParameter);
 
-			customAdParameters.setApp_ver(app_version);
-			customAdParameters.setSdk_ver(SDK_VERSION);
+			MyLibrary.setApp_ver(app_version);
+			MyLibrary.setSdk_ver(SDK_VERSION);
+			MyLibrary.setSdk_name("com.commutestreamsdk");
+			MyLibrary.setApp_name(activity.getPackageName());
 
-			customAdParameters.setAid_sha(getAndroidIDHash(activity, "SHA1"));
-			customAdParameters.setAid_md5(getAndroidIDHash(activity, "MD5"));
+			MyLibrary.setAid_sha(getAndroidIDHash(activity, "SHA1"));
+			MyLibrary.setAid_md5(getAndroidIDHash(activity, "MD5"));
 
-			// set App/Lib version info in MyLibrary
-			MyLibrary.setLibName("com.commutestreamsdk");
-			MyLibrary.setLibVersionName(SDK_VERSION);
-			MyLibrary.setAppName(activity.getPackageName());
-			MyLibrary.setAppVersionName(app_version);
-			
-			//set init so we don't do this stuff again
+			// set init so we don't do this stuff again
 			MyLibrary.setInitialized(true);
 		}
 
-		customAdParameters.setBanner_height(Integer.toString(adSize
+		// set the banner height
+		MyLibrary.setBanner_height(Integer.toString(adSize
 				.getHeightInPixels(activity)));
-		customAdParameters.setBanner_width(Integer.toString(adSize
+		MyLibrary.setBanner_width(Integer.toString(adSize
 				.getWidthInPixels(activity)));
 
-		// get parameters
-		params = customAdParameters.getHttpParams();
-		params.put("skip_fetch", "false");
+		MyLibrary.http_params.put("skip_fetch", "false");
 
-		// attempt to "banner" an item from the server
-		RestClient.get("banner", params, new JsonHttpResponseHandler() {
+		// attempt to get a "banner" from the server
+		RestClient.get("banner", MyLibrary.http_params,
+				new JsonHttpResponseHandler() {
 
-			@Override
-			public void onSuccess(JSONObject response) {
-				try {
-					// String banner_request_uuid = response.getString("banner_request_uuid");
-					String html = response.getString("html");
-					String url = response.getString("url");
-					Boolean item_returned = response.getBoolean("item_returned");
+					@Override
+					public void onSuccess(JSONObject response) {
+						try {
+							// String banner_request_uuid =
+							// response.getString("banner_request_uuid");
+							String html = response.getString("html");
+							String url = response.getString("url");
+							Boolean item_returned = response
+									.getBoolean("item_returned");
 
-					// if there is something that the server wants us to display
-					// we generate a webview for it and pass it on to admob
-					if (item_returned) {
-						adView = generateWebView(listener, activity, label,
-								serverParameter, adSize, request,
-								customEventExtra, html, url);
-						listener.onReceivedAd(adView);
-					} else {
-						listener.onFailedToReceiveAd();
+							if(response.has("error")){
+								String error = response.getString("error");
+								Log.e("CS_SDK", "Error from banner server: " + error);
+							}
+							
+							// if there is something that the server wants us to
+							// display we generate a webview for it and pass it
+							// on to admob
+							if (item_returned) {
+								adView = generateWebView(listener, activity,
+										label, serverParameter, adSize,
+										request, customEventExtra, html, url);
+								listener.onReceivedAd(adView);
+							} else {
+								listener.onFailedToReceiveAd();
+							}
+
+						} catch (JSONException e) {
+							e.printStackTrace();
+							listener.onFailedToReceiveAd();
+						}
 					}
 
-				} catch (JSONException e) {
-					e.printStackTrace();
-					listener.onFailedToReceiveAd();
-				}
-			}
-
-			@Override
-			public void onFailure(Throwable e, JSONObject errorResponse) {
-				Log.v("CS_SDK", "FETCH FAILED");
-				listener.onFailedToReceiveAd();
-			}
-		});
+					@Override
+					public void onFailure(Throwable e, JSONObject errorResponse) {
+						Log.v("CS_SDK", "FETCH FAILED");
+						listener.onFailedToReceiveAd();
+					}
+				});
 
 		// Log.v("CS_SDK", "End of requestBannerAd");
 	}
@@ -152,8 +152,7 @@ public class CustomAd implements CustomEventBanner, AdListener {
 		try {
 			MessageDigest md = MessageDigest.getInstance(hashing);
 			byte[] hashBytes = md.digest(mmdid.getBytes());
-			hex = Base64.encodeToString(hashBytes, 0, hashBytes.length,
-					0);
+			hex = Base64.encodeToString(hashBytes, 0, hashBytes.length, 0);
 
 		} catch (Exception e) {
 			return null;
@@ -172,10 +171,10 @@ public class CustomAd implements CustomEventBanner, AdListener {
 		webView.setVerticalScrollBarEnabled(false);
 		webView.setHorizontalScrollBarEnabled(false);
 		webView.loadData(html, "text/html", null);
-		
-		//update the time of the banner request
-		((CustomAdParameters) customEventExtra).setLastServerRequestTime(new Date());
-		
+
+		// update the time of the banner request
+		MyLibrary.setLastServerRequestTime(new Date());
+
 		webView.setLayoutParams(new RelativeLayout.LayoutParams(adSize
 				.getWidthInPixels(activity), adSize.getHeightInPixels(activity)));
 		webView.setOnTouchListener(new OnTouchListener() {

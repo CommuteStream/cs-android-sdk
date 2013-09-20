@@ -127,7 +127,7 @@ public class AsyncHttpClient {
         HttpConnectionParams.setSocketBufferSize(httpParams, DEFAULT_SOCKET_BUFFER_SIZE);
 
         HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
-        HttpProtocolParams.setUserAgent(httpParams, String.format("%s/%s %s/%s", MyLibrary.getLibName(), MyLibrary.getLibVersionName(), MyLibrary.getAppName(), MyLibrary.getAppVersionName()));
+        HttpProtocolParams.setUserAgent(httpParams, String.format("%s/%s %s/%s", MyLibrary.getSdk_name(), MyLibrary.getSdk_ver(), MyLibrary.getApp_name(), MyLibrary.getApp_ver()));
 
         SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
