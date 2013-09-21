@@ -30,8 +30,8 @@ public class CommuteStream {
 					public void run() {
 						//Log.v("CS_SDK", "parameterCheckTimer FIRED");
 
-						if (lastParameterChange.getTime() > MyLibrary.lastServerRequestTime
-								.getTime()) {
+						if (MyLibrary.isInitialized() && (lastParameterChange.getTime() > MyLibrary.lastServerRequestTime
+								.getTime())) {
 							Log.v("CS_SDK", "Updating the server.");
 
 							MyLibrary.http_params.put("skip_fetch", "true");
