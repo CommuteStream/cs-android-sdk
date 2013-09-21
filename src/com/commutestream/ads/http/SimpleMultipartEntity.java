@@ -21,7 +21,7 @@
     http://blog.rafaelsanches.com/2011/01/29/upload-using-multipart-post-using-httpclient-in-android/
 */
 
-package com.commutestreamsdk.http;
+package com.commutestream.ads.http;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

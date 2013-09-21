@@ -16,7 +16,7 @@
     limitations under the License.
 */
 
-package com.commutestreamsdk.http;
+package com.commutestream.ads.http;
 
 import org.apache.http.HttpStatus;
 import org.json.JSONArray;

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.commutestreamsdk"
+    package="com.commutestream.ads"
     android:versionCode="1"
     android:versionName="@string/app_versionName" >
 

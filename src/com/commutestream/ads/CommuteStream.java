@@ -1,4 +1,4 @@
-package com.commutestreamsdk;
+package com.commutestream.ads;
 
 import java.util.Date;
 import java.util.Timer;
@@ -6,8 +6,8 @@ import java.util.Timer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.commutestreamsdk.http.JsonHttpResponseHandler;
-import com.commutestreamsdk.http.RequestParams;
+import com.commutestream.ads.http.JsonHttpResponseHandler;
+import com.commutestream.ads.http.RequestParams;
 
 import android.location.Location;
 import android.util.Log;

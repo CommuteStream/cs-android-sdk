@@ -21,7 +21,7 @@
     fantastic droid-fu project: https://github.com/donnfelker/droid-fu
 */
 
-package com.commutestreamsdk.http;
+package com.commutestream.ads.http;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;

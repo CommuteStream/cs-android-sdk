@@ -1,4 +1,4 @@
-package com.commutestreamsdk.http;
+package com.commutestream.ads.http;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;

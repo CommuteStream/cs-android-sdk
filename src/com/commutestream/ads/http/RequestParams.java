@@ -16,7 +16,7 @@
     limitations under the License.
 */
 
-package com.commutestreamsdk.http;
+package com.commutestream.ads.http;
 
 import java.io.InputStream;
 import java.io.File;

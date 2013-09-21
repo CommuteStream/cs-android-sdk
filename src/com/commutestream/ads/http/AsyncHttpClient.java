@@ -16,7 +16,7 @@
     limitations under the License.
 */
 
-package com.commutestreamsdk.http;
+package com.commutestream.ads.http;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,7 +67,7 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.SyncBasicHttpContext;
 
-import com.commutestreamsdk.MyLibrary;
+import com.commutestream.ads.MyLibrary;
 
 import android.content.Context;
 
