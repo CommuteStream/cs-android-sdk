@@ -19,7 +19,6 @@ import android.widget.RelativeLayout;
 import android.content.pm.PackageManager.NameNotFoundException;
 
 import com.commutestream.ads.http.JsonHttpResponseHandler;
-import com.commutestream.ads.http.RequestParams;
 
 import com.google.ads.Ad;
 import com.google.ads.AdListener;
@@ -31,13 +30,14 @@ import com.google.ads.mediation.customevent.CustomEventBannerListener;
 
 //CustomEventBanner and AdListener implementations providing the 
 //basis for CommuteStream CustomEvent support in AdMob 
+//It's this class that get's instantiated by AdMob when it wants
+//a new ad
 public class CustomAd implements CustomEventBanner, AdListener {
 
 	private CustomEventBannerListener bannerListener;
 	private WebView adView;
 	// private Timer parameterCheckTimer = new Timer();
 	// private Date lastServerRequestTime = new Date();
-	private RequestParams params;
 	private String app_version;
 
 	// We cannot package resources with the jar file and therefor

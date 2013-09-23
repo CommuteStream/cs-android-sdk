@@ -12,14 +12,19 @@ import com.commutestream.ads.http.RequestParams;
 import android.location.Location;
 import android.util.Log;
 
+//This class is explicitly instantiate by the app. It's 
+//interfaces allow an app to communicate directly with the 
+//CommuteStream SDK (primarily for providing information 
+//about the user). It also handles the timer which then
+//watches for parameter changes and sends them to the server
+//(out of line with ad delivery).
 public class CommuteStream {
-	
+
 	private Date lastParameterChange;
 	private Timer parameterCheckTimer = new Timer();
 
 	public CommuteStream() {
 		Log.v("CS_SDK", "IN THE CustomAdParmeters Constructor");
-
 
 		// Every few seconds we should check to see if the parameters have been
 		// updated since the last request to the server. If so we should send
@@ -28,10 +33,11 @@ public class CommuteStream {
 				new ParameterUpdateCheckTimer(MyLibrary.lastServerRequestTime) {
 					@Override
 					public void run() {
-						//Log.v("CS_SDK", "parameterCheckTimer FIRED");
+						// Log.v("CS_SDK", "parameterCheckTimer FIRED");
 
-						if (MyLibrary.isInitialized() && (lastParameterChange.getTime() > MyLibrary.lastServerRequestTime
-								.getTime())) {
+						if (MyLibrary.isInitialized()
+								&& (lastParameterChange.getTime() > MyLibrary.lastServerRequestTime
+										.getTime())) {
 							Log.v("CS_SDK", "Updating the server.");
 
 							MyLibrary.http_params.put("skip_fetch", "true");
@@ -43,12 +49,16 @@ public class CommuteStream {
 												JSONObject response) {
 											MyLibrary.lastServerRequestTime = lastParameterChange;
 											try {
-												if(response.has("error")){
-													String error = response.getString("error");
-													Log.e("CS_SDK", "Error from banner server: " + error);
+												if (response.has("error")) {
+													String error = response
+															.getString("error");
+													Log.e("CS_SDK",
+															"Error from banner server: "
+																	+ error);
 												}
 											} catch (JSONException e) {
-												// TODO Auto-generated catch block
+												// TODO Auto-generated catch
+												// block
 												e.printStackTrace();
 											}
 										}
@@ -108,7 +118,6 @@ public class CommuteStream {
 		return MyLibrary.http_params;
 	}
 
-
 	public String getLocation() {
 		return MyLibrary.lat;
 	}
@@ -125,8 +134,6 @@ public class CommuteStream {
 		MyLibrary.http_params.put("fix_time", MyLibrary.fix_time);
 		this.parameterChange();
 	}
-
-
 
 	public String getTesting() {
 		return MyLibrary.testing;

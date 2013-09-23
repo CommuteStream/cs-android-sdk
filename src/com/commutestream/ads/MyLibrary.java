@@ -6,7 +6,11 @@ import com.commutestream.ads.http.RequestParams;
 
 import android.app.Application;
 import android.location.Location;
-import android.util.Log;
+
+//This application extension is where we store things that 
+//should persist for the life of the application. i.e. The 
+//CommuteStream class may get destroyed and re-instantiated 
+//if it's within a view that gets destroyed and re-created
 
 public class MyLibrary extends Application {
 	private static boolean initialized = false;
@@ -28,16 +32,15 @@ public class MyLibrary extends Application {
 	static String aid_sha;
 	static String aid_md5;
 	static String testing;
-	
+
 	static Location location;
-	
+
 	static RequestParams http_params = new RequestParams();
-	
 
 	static Date lastServerRequestTime = new Date();
 
-    public void onCreate(){
-    }
+	public void onCreate() {
+	}
 
 	public static String getApp_name() {
 		return app_name;
@@ -48,7 +51,6 @@ public class MyLibrary extends Application {
 		http_params.put("app_name", app_name);
 	}
 
-
 	public static String getApp_ver() {
 		return MyLibrary.app_ver;
 	}
@@ -58,7 +60,6 @@ public class MyLibrary extends Application {
 		http_params.put("app_ver", app_ver);
 	}
 
-
 	public static String getSdk_name() {
 		return sdk_name;
 	}
@@ -66,7 +67,7 @@ public class MyLibrary extends Application {
 	public static void setSdk_name(String sdk_name) {
 		MyLibrary.sdk_name = sdk_name;
 	}
-	
+
 	public static String getSdk_ver() {
 		return MyLibrary.sdk_ver;
 	}
@@ -75,7 +76,6 @@ public class MyLibrary extends Application {
 		MyLibrary.sdk_ver = sdk_ver;
 		MyLibrary.http_params.put("sdk_ver", sdk_ver);
 	}
-	
 
 	public static String getAid_sha() {
 		return MyLibrary.aid_sha;
@@ -89,12 +89,11 @@ public class MyLibrary extends Application {
 	public static String getAid_md5() {
 		return MyLibrary.aid_md5;
 	}
-	
+
 	public static void setAid_md5(String aid_md5) {
 		MyLibrary.aid_md5 = aid_md5;
 		MyLibrary.http_params.put("aid_md5", aid_md5);
 	}
-	
 
 	public static String getBanner_height() {
 		return MyLibrary.banner_height;
@@ -121,7 +120,6 @@ public class MyLibrary extends Application {
 	public static void setInitialized(boolean initialized) {
 		MyLibrary.initialized = initialized;
 	}
-	
 
 	public static String getAd_unit_uuid() {
 		return MyLibrary.ad_unit_uuid;
@@ -131,11 +129,9 @@ public class MyLibrary extends Application {
 		MyLibrary.ad_unit_uuid = ad_unit_uuid;
 		http_params.put("ad_unit_uuid", ad_unit_uuid);
 	}
-	
 
 	public static void setLastServerRequestTime(Date date) {
 		MyLibrary.lastServerRequestTime = date;
 	}
-	
 
 }
