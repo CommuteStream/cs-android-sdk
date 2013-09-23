@@ -56,9 +56,9 @@ public class CustomAd implements CustomEventBanner, AdListener {
 
 		// There are some things we need to get from the activity and AdMob on
 		// the first Banner Request
-		if (!MyLibrary.isInitialized()) {
+		if (!CommuteStream.isInitialized()) {
 
-			 Log.v("CS_SDK", "Initializing MyLibrary");
+			 Log.v("CS_SDK", "Initializing CommuteStream");
 
 			// Get the versionName of the app using this library
 			try {
@@ -70,30 +70,30 @@ public class CustomAd implements CustomEventBanner, AdListener {
 			}
 
 			// set the the parameter specified in AdMob
-			MyLibrary.setAd_unit_uuid(serverParameter);
+			CommuteStream.setAd_unit_uuid(serverParameter);
 
-			MyLibrary.setApp_ver(app_version);
-			MyLibrary.setSdk_ver(SDK_VERSION);
-			MyLibrary.setSdk_name("com.commutestreamsdk");
-			MyLibrary.setApp_name(activity.getPackageName());
+			CommuteStream.setApp_ver(app_version);
+			CommuteStream.setSdk_ver(SDK_VERSION);
+			CommuteStream.setSdk_name("com.commutestreamsdk");
+			CommuteStream.setApp_name(activity.getPackageName());
 
-			MyLibrary.setAid_sha(getAndroidIDHash(activity, "SHA1"));
-			MyLibrary.setAid_md5(getAndroidIDHash(activity, "MD5"));
+			CommuteStream.setAid_sha(getAndroidIDHash(activity, "SHA1"));
+			CommuteStream.setAid_md5(getAndroidIDHash(activity, "MD5"));
 
 			// set init so we don't do this stuff again
-			MyLibrary.setInitialized(true);
+			CommuteStream.setInitialized(true);
 		}
 
 		// set the banner height
-		MyLibrary.setBanner_height(Integer.toString(adSize
+		CommuteStream.setBanner_height(Integer.toString(adSize
 				.getHeightInPixels(activity)));
-		MyLibrary.setBanner_width(Integer.toString(adSize
+		CommuteStream.setBanner_width(Integer.toString(adSize
 				.getWidthInPixels(activity)));
 
-		MyLibrary.http_params.put("skip_fetch", "false");
+		CommuteStream.http_params.put("skip_fetch", "false");
 
 		// attempt to get a "banner" from the server
-		RestClient.get("banner", MyLibrary.http_params,
+		RestClient.get("banner", CommuteStream.http_params,
 				new JsonHttpResponseHandler() {
 
 					@Override
@@ -171,7 +171,7 @@ public class CustomAd implements CustomEventBanner, AdListener {
 		webView.loadData(html, "text/html", null);
 
 		// update the time of the banner request
-		MyLibrary.setLastServerRequestTime(new Date());
+		CommuteStream.setLastServerRequestTime(new Date());
 
 		webView.setLayoutParams(new RelativeLayout.LayoutParams(adSize
 				.getWidthInPixels(activity), adSize.getHeightInPixels(activity)));
