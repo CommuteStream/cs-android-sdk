@@ -48,6 +48,15 @@ public class CommuteStream extends Application {
 	
 	private static Timer parameterCheckTimer = new Timer();
 
+	public void onCreate(){
+		Log.v("CS_SDK", "XXX ON CREATE");
+		
+	}
+	public CommuteStream(){
+		Log.v("CS_SDK", "XXX CONSTRUCTOR");
+		
+	}
+
 	public static void init() {
 		Log.v("CS_SDK", "Initializing CommuteStream");
 
