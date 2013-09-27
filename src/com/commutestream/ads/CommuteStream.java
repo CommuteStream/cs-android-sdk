@@ -35,6 +35,9 @@ public class CommuteStream extends Application {
 	static String lon;
 	static String acc;
 	static String fix_time;
+
+	static String agency_interest = "";
+
 	static String aid_sha;
 	static String aid_md5;
 	static String testing;
@@ -45,26 +48,18 @@ public class CommuteStream extends Application {
 
 	static Date lastServerRequestTime = new Date();
 	private static Date lastParameterChange = new Date();
-	
+
 	private static Timer parameterCheckTimer = new Timer();
 
-	public void onCreate(){
-		Log.v("CS_SDK", "XXX ON CREATE");
-		
-	}
-	public CommuteStream(){
-		Log.v("CS_SDK", "XXX CONSTRUCTOR");
-		
-	}
-
 	public static void init() {
-		Log.v("CS_SDK", "Initializing CommuteStream");
+		Log.v("CS_SDK", "init()");
 
 		// Every few seconds we should check to see if the parameters have been
 		// updated since the last request to the server. If so we should send
 		// the new parameters to ensure the server has the latest user info
 		CommuteStream.parameterCheckTimer.scheduleAtFixedRate(
-				new ParameterUpdateCheckTimer(CommuteStream.lastServerRequestTime) {
+				new ParameterUpdateCheckTimer(
+						CommuteStream.lastServerRequestTime) {
 					@Override
 					public void run() {
 						Log.v("CS_SDK", "TIMER FIRED");
@@ -104,7 +99,7 @@ public class CommuteStream extends Application {
 									});
 						}
 					}
-				}, 10000, 10000);
+				}, 20000, 20000);
 	}
 
 	public static String getApp_name() {
@@ -194,48 +189,60 @@ public class CommuteStream extends Application {
 		CommuteStream.ad_unit_uuid = ad_unit_uuid;
 		CommuteStream.http_params.put("ad_unit_uuid", ad_unit_uuid);
 	}
-	
-	//App Interface
-	
 
-	public static void setAgency_id(String agency_id) {
-		Log.v("CS_SDK", "Agency changed to: " + agency_id);
-		CommuteStream.agency_id = agency_id;
-		CommuteStream.http_params.put("agency_id", agency_id);
+	// App Interface
+
+	// This should be called by the app whenever tracking times for a given
+	// route are displayed to a user
+	public static void trackingDisplayed(String agency_id, String route_id,
+			String stop_id) {
+		setAgency_interest("TRACKING_DISPLAYED", agency_id, route_id, stop_id);
+	}
+
+	public static void alertDisplayed(String agency_id, String route_id,
+			String stop_id) {
+		setAgency_interest("ALERT_DISPLAYED", agency_id, route_id, stop_id);
+	}
+
+	public static void mapDisplayed(String agency_id, String route_id,
+			String stop_id) {
+		setAgency_interest("MAP_DISPLAYED", agency_id, route_id, stop_id);
+	}
+
+	public static void favoriteAdded(String agency_id, String route_id,
+			String stop_id) {
+		setAgency_interest("FAVORITE_ADDED", agency_id, route_id, stop_id);
+	}
+
+	public static void tripPlanningPointA(String agency_id, String route_id,
+			String stop_id) {
+		setAgency_interest("TRIP_PLANNING_POINT_A", agency_id, route_id,
+				stop_id);
+	}
+
+	public static void tripPlanningPointB(String agency_id, String route_id,
+			String stop_id) {
+		setAgency_interest("TRIP_PLANNING_POINT_B", agency_id, route_id,
+				stop_id);
+	}
+
+	private static void setAgency_interest(String type, String agency_id,
+			String route_id, String stop_id) {
+		// ad a comma if needed
+		if (CommuteStream.agency_interest.length() > 0) {
+			CommuteStream.agency_interest += ',';
+		}
+
+		CommuteStream.agency_interest += type + "," + agency_id + ","
+				+ route_id + "," + stop_id;
+		CommuteStream.http_params.put("agency_interest",
+				CommuteStream.agency_interest);
 		CommuteStream.parameterChange();
-	}
-
-	public static String getAgency_id() {
-		return CommuteStream.agency_id;
-	}
-	
-
-	public static void setStop_id(String stop_id) {
-		CommuteStream.stop_id = stop_id;
-		CommuteStream.http_params.put("stop_id", stop_id);
-		CommuteStream.parameterChange();
-	}
-
-	public static String getStop_id() {
-		return CommuteStream.stop_id;
-	}
-
-	public static void setRoute_id(String route_id) {
-		CommuteStream.route_id = route_id;
-		CommuteStream.http_params.put("route_id", route_id);
-		CommuteStream.parameterChange();
-	}
-
-	public static String getRoute_id() {
-		return CommuteStream.route_id;
-	}
-	
-
-	public static String getLocation() {
-		return CommuteStream.lat;
 	}
 
 	public static void setLocation(Location location) {
+		// TODO - check accuracy of location and don't send locations that are
+		// not better than the last
 		CommuteStream.location = location;
 		CommuteStream.lat = Double.toString(location.getLatitude());
 		CommuteStream.lon = Double.toString(location.getLongitude());
@@ -247,7 +254,7 @@ public class CommuteStream extends Application {
 		CommuteStream.http_params.put("fix_time", CommuteStream.fix_time);
 		CommuteStream.parameterChange();
 	}
-	
+
 	public static String getTesting() {
 		return CommuteStream.testing;
 	}
@@ -256,14 +263,25 @@ public class CommuteStream extends Application {
 		CommuteStream.testing = testing;
 		CommuteStream.http_params.put("testing", testing);
 	}
-	
-	
 
-	public static void setLastServerRequestTime(Date date) {
-		CommuteStream.lastServerRequestTime = date;
+	public static void reportSuccessfulGet() {
+		CommuteStream.lastServerRequestTime = new Date();
+
+		// clear parameters that should only be sent once
+		CommuteStream.http_params.remove("lat");
+		CommuteStream.http_params.remove("lon");
+		CommuteStream.http_params.remove("acc");
+		CommuteStream.http_params.remove("agency_interest");
+
+		CommuteStream.agency_interest = "";
+
 	}
 
 	public static void parameterChange() {
+		CommuteStream.lastParameterChange = new Date();
+	}
+
+	public static void parametersSent() {
 		CommuteStream.lastParameterChange = new Date();
 	}
 }

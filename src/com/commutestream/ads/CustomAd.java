@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.widget.RelativeLayout;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -58,7 +60,7 @@ public class CustomAd implements CustomEventBanner, AdListener {
 		// the first Banner Request
 		if (!CommuteStream.isInitialized()) {
 
-			 Log.v("CS_SDK", "Initializing CommuteStream");
+			Log.v("CS_SDK", "Retrieving Info");
 
 			// Get the versionName of the app using this library
 			try {
@@ -99,6 +101,10 @@ public class CustomAd implements CustomEventBanner, AdListener {
 					@Override
 					public void onSuccess(JSONObject response) {
 						try {
+
+							// update the time of the banner request
+							CommuteStream.reportSuccessfulGet();
+
 							// String banner_request_uuid =
 							// response.getString("banner_request_uuid");
 							String html = response.getString("html");
@@ -106,11 +112,12 @@ public class CustomAd implements CustomEventBanner, AdListener {
 							Boolean item_returned = response
 									.getBoolean("item_returned");
 
-							if(response.has("error")){
+							if (response.has("error")) {
 								String error = response.getString("error");
-								Log.e("CS_SDK", "Error from banner server: " + error);
+								Log.e("CS_SDK", "Error from banner server: "
+										+ error);
 							}
-							
+
 							// if there is something that the server wants us to
 							// display we generate a webview for it and pass it
 							// on to admob
@@ -166,12 +173,22 @@ public class CustomAd implements CustomEventBanner, AdListener {
 
 		// create a new webview and put the ad in it
 		WebView webView = new WebView(activity);
+
+		//This block allows JS console messages to be transported to LogCat
+		webView.setWebChromeClient(new WebChromeClient() {
+			public boolean onConsoleMessage(ConsoleMessage cm) {
+				Log.v("CS_SDK_WebView",
+						cm.message() + " -- From line " + cm.lineNumber()
+								+ " of " + cm.sourceId());
+				return true;
+			}
+		});
+		
 		webView.setVerticalScrollBarEnabled(false);
 		webView.setHorizontalScrollBarEnabled(false);
+		webView.getSettings().setJavaScriptEnabled(true);
 		webView.loadData(html, "text/html", null);
 
-		// update the time of the banner request
-		CommuteStream.setLastServerRequestTime(new Date());
 
 		webView.setLayoutParams(new RelativeLayout.LayoutParams(adSize
 				.getWidthInPixels(activity), adSize.getHeightInPixels(activity)));
