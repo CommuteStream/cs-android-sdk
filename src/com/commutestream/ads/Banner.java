@@ -34,7 +34,7 @@ import com.google.ads.mediation.customevent.CustomEventBannerListener;
 //basis for CommuteStream CustomEvent support in AdMob 
 //It's this class that get's instantiated by AdMob when it wants
 //a new ad
-public class CustomAd implements CustomEventBanner, AdListener {
+public class Banner implements CustomEventBanner, AdListener {
 
 	private CustomEventBannerListener bannerListener;
 	private WebView adView;
@@ -192,6 +192,10 @@ public class CustomAd implements CustomEventBanner, AdListener {
 
 		webView.setLayoutParams(new RelativeLayout.LayoutParams(adSize
 				.getWidthInPixels(activity), adSize.getHeightInPixels(activity)));
+		
+		//webView.getSettings().setLoadWithOverviewMode(true);
+		webView.getSettings().setUseWideViewPort(true);
+		
 		webView.setOnTouchListener(new OnTouchListener() {
 
 			// handle clicks on our new ad

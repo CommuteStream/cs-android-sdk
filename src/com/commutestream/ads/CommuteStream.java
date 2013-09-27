@@ -259,8 +259,8 @@ public class CommuteStream extends Application {
 		return CommuteStream.testing;
 	}
 
-	public static void setTesting(String testing) {
-		CommuteStream.testing = testing;
+	public static void setTesting() {
+		CommuteStream.testing = "true";
 		CommuteStream.http_params.put("testing", testing);
 	}
 
