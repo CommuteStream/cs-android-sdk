@@ -171,6 +171,8 @@ public class Banner implements CustomEventBanner, AdListener {
 			AdSize adSize, MediationAdRequest request,
 			final Object customEventExtra, String html, final String url) {
 
+
+		Log.v("CS_SDK", "Generating WebView");
 		// create a new webview and put the ad in it
 		WebView webView = new WebView(activity);
 
@@ -178,8 +180,7 @@ public class Banner implements CustomEventBanner, AdListener {
 		webView.setWebChromeClient(new WebChromeClient() {
 			public boolean onConsoleMessage(ConsoleMessage cm) {
 				Log.v("CS_SDK_WebView",
-						cm.message() + " -- From line " + cm.lineNumber()
-								+ " of " + cm.sourceId());
+						cm.message() + " -- From line " + cm.lineNumber());
 				return true;
 			}
 		});
@@ -195,20 +196,22 @@ public class Banner implements CustomEventBanner, AdListener {
 		
 		//webView.getSettings().setLoadWithOverviewMode(true);
 		webView.getSettings().setUseWideViewPort(true);
-		
 		webView.setOnTouchListener(new OnTouchListener() {
 
 			// handle clicks on our new ad
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				try {
-					// TODO reenable to record admob clicks
-					// listener.onClick();
-					// listener.onPresentScreen();
-					// listener.onLeaveApplication();
-					Intent intent = new Intent(Intent.ACTION_VIEW, Uri
-							.parse(url));
-					activity.startActivity(intent);
+					if(event.getAction() == MotionEvent.ACTION_DOWN){
+						// TODO reenable to record admob clicks
+						// listener.onClick();
+						// listener.onPresentScreen();
+						// listener.onLeaveApplication();
+						Log.v("CS_SDK", "Banner Tapped");
+						Intent intent = new Intent(Intent.ACTION_VIEW, Uri
+								.parse(url));
+						activity.startActivity(intent);
+					}
 				} catch (Throwable t) {
 					// Something went wrong, oh well.
 				}
