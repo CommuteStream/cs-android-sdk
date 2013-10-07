@@ -75,7 +75,8 @@ public class CommuteStream extends Application {
 										@Override
 										public void onSuccess(
 												JSONObject response) {
-											CommuteStream.lastServerRequestTime = CommuteStream.lastParameterChange;
+											CommuteStream.reportSuccessfulGet();
+											//CommuteStream.lastServerRequestTime = CommuteStream.lastParameterChange;
 											try {
 												if (response.has("error")) {
 													String error = response
@@ -271,6 +272,7 @@ public class CommuteStream extends Application {
 		CommuteStream.http_params.remove("lat");
 		CommuteStream.http_params.remove("lon");
 		CommuteStream.http_params.remove("acc");
+		CommuteStream.http_params.remove("fix_time");
 		CommuteStream.http_params.remove("agency_interest");
 
 		CommuteStream.agency_interest = "";
