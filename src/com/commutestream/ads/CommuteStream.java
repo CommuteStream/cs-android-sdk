@@ -21,32 +21,31 @@ import android.util.Log;
 public class CommuteStream extends Application {
 	private static boolean initialized = false;
 
-	static String ad_unit_uuid;
-	static String banner_height;
-	static String banner_width;
-	static String sdk_name;
-	static String app_name;
-	static String sdk_ver;
-	static String app_ver;
-	static String agency_id;
-	static String stop_id;
-	static String route_id;
-	static String lat;
-	static String lon;
-	static String acc;
-	static String fix_time;
+	private static String ad_unit_uuid;
+	private static String banner_height;
+	private static String banner_width;
+	private static String sdk_name = "com.commutestreamsdk";
+	private static String sdk_ver = "0.1.0";
+	private static String app_name;
+	private static String app_ver;
+	private static String lat;
+	private static String lon;
+	private static String acc;
+	private static String fix_time;
+	
+	private static Location currentBestLocation;
 
-	static String agency_interest = "";
+	private static String api_url = "https://api.commutestream.com:3000/";
 
-	static String aid_sha;
-	static String aid_md5;
-	static String testing;
+	private static String agency_interest = "";
 
-	static Location location;
+	private static String aid_sha;
+	private static String aid_md5;
+	private static Boolean testing = false;
 
-	static RequestParams http_params = new RequestParams();
+	private static RequestParams http_params = new RequestParams();
 
-	static Date lastServerRequestTime = new Date();
+	private static Date lastServerRequestTime = new Date();
 	private static Date lastParameterChange = new Date();
 
 	private static Timer parameterCheckTimer = new Timer();
@@ -76,7 +75,9 @@ public class CommuteStream extends Application {
 										public void onSuccess(
 												JSONObject response) {
 											CommuteStream.reportSuccessfulGet();
-											//CommuteStream.lastServerRequestTime = CommuteStream.lastParameterChange;
+											// CommuteStream.lastServerRequestTime
+											// =
+											// CommuteStream.lastParameterChange;
 											try {
 												if (response.has("error")) {
 													String error = response
@@ -138,6 +139,14 @@ public class CommuteStream extends Application {
 		CommuteStream.http_params.put("sdk_ver", sdk_ver);
 	}
 
+	public static String getApi_url() {
+		return CommuteStream.api_url;
+	}
+
+	public static void setApi_url(String api_url) {
+		CommuteStream.api_url = api_url;
+	}
+
 	public static String getAid_sha() {
 		return CommuteStream.aid_sha;
 	}
@@ -191,6 +200,14 @@ public class CommuteStream extends Application {
 		CommuteStream.http_params.put("ad_unit_uuid", ad_unit_uuid);
 	}
 
+	public static void setSkip_fetch(String skip_fetch) {
+		CommuteStream.http_params.put("skip_fetch", skip_fetch);
+	}
+
+	public static RequestParams getHttp_params() {
+		return CommuteStream.http_params;
+	}
+
 	// App Interface
 
 	// This should be called by the app whenever tracking times for a given
@@ -227,6 +244,32 @@ public class CommuteStream extends Application {
 				stop_id);
 	}
 
+	public static void setLocation(Location location) {
+		//We check that the new location is a better one before sending it
+		if(isBetterLocation(location, CommuteStream.currentBestLocation)){
+			CommuteStream.currentBestLocation = location;
+			CommuteStream.lat = Double.toString(location.getLatitude());
+			CommuteStream.lon = Double.toString(location.getLongitude());
+			CommuteStream.acc = Double.toString(location.getAccuracy());
+			CommuteStream.fix_time = Long.toString(location.getTime());
+			CommuteStream.http_params.put("lat", CommuteStream.lat);
+			CommuteStream.http_params.put("lon", CommuteStream.lon);
+			CommuteStream.http_params.put("acc", CommuteStream.acc);
+			CommuteStream.http_params.put("fix_time", CommuteStream.fix_time);
+			CommuteStream.parameterChange();
+		}
+	}
+
+	public static Boolean getTesting() {
+		return CommuteStream.testing;
+	}
+
+	public static void setTesting() {
+		CommuteStream.testing = true;
+		CommuteStream.http_params.put("testing", "true");
+		Log.v("CS_SDK", "Testing Mode Set");
+	}
+
 	private static void setAgency_interest(String type, String agency_id,
 			String route_id, String stop_id) {
 		// ad a comma if needed
@@ -239,30 +282,6 @@ public class CommuteStream extends Application {
 		CommuteStream.http_params.put("agency_interest",
 				CommuteStream.agency_interest);
 		CommuteStream.parameterChange();
-	}
-
-	public static void setLocation(Location location) {
-		// TODO - check accuracy of location and don't send locations that are
-		// not better than the last
-		CommuteStream.location = location;
-		CommuteStream.lat = Double.toString(location.getLatitude());
-		CommuteStream.lon = Double.toString(location.getLongitude());
-		CommuteStream.acc = Double.toString(location.getAccuracy());
-		CommuteStream.fix_time = Long.toString(location.getTime());
-		CommuteStream.http_params.put("lat", CommuteStream.lat);
-		CommuteStream.http_params.put("lon", CommuteStream.lon);
-		CommuteStream.http_params.put("acc", CommuteStream.acc);
-		CommuteStream.http_params.put("fix_time", CommuteStream.fix_time);
-		CommuteStream.parameterChange();
-	}
-
-	public static String getTesting() {
-		return CommuteStream.testing;
-	}
-
-	public static void setTesting() {
-		CommuteStream.testing = "true";
-		CommuteStream.http_params.put("testing", testing);
 	}
 
 	public static void reportSuccessfulGet() {
@@ -286,4 +305,74 @@ public class CommuteStream extends Application {
 	public static void parametersSent() {
 		CommuteStream.lastParameterChange = new Date();
 	}
+
+	// Location helper stuff
+	private static final int TWO_MINUTES = 1000 * 60 * 2;
+
+	/**
+	 * Determines whether one Location reading is better than the current
+	 * Location fix
+	 * 
+	 * @param location
+	 *            The new Location that you want to evaluate
+	 * @param currentBestLocation
+	 *            The current Location fix, to which you want to compare the new
+	 *            one
+	 */
+	protected static boolean isBetterLocation(Location location,
+			Location currentBestLocation) {
+		if (currentBestLocation == null) {
+			// A new location is always better than no location
+			return true;
+		}
+
+		// Check whether the new location fix is newer or older
+		long timeDelta = location.getTime() - currentBestLocation.getTime();
+		boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
+		boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
+		boolean isNewer = timeDelta > 0;
+
+		// If it's been more than two minutes since the current location, use
+		// the new location
+		// because the user has likely moved
+		if (isSignificantlyNewer) {
+			return true;
+			// If the new location is more than two minutes older, it must be
+			// worse
+		} else if (isSignificantlyOlder) {
+			return false;
+		}
+
+		// Check whether the new location fix is more or less accurate
+		int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation
+				.getAccuracy());
+		boolean isLessAccurate = accuracyDelta > 0;
+		boolean isMoreAccurate = accuracyDelta < 0;
+		boolean isSignificantlyLessAccurate = accuracyDelta > 200;
+
+		// Check if the old and new location are from the same provider
+		boolean isFromSameProvider = isSameProvider(location.getProvider(),
+				currentBestLocation.getProvider());
+
+		// Determine location quality using a combination of timeliness and
+		// accuracy
+		if (isMoreAccurate) {
+			return true;
+		} else if (isNewer && !isLessAccurate) {
+			return true;
+		} else if (isNewer && !isSignificantlyLessAccurate
+				&& isFromSameProvider) {
+			return true;
+		}
+		return false;
+	}
+
+	/** Checks whether two providers are the same */
+	private static boolean isSameProvider(String provider1, String provider2) {
+		if (provider1 == null) {
+			return provider2 == null;
+		}
+		return provider1.equals(provider2);
+	}
+
 }

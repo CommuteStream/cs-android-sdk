@@ -1,7 +1,6 @@
 package com.commutestream.ads;
 
 import java.security.MessageDigest;
-import java.util.Date;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,13 +37,7 @@ public class Banner implements CustomEventBanner, AdListener {
 
 	private CustomEventBannerListener bannerListener;
 	private WebView adView;
-	// private Timer parameterCheckTimer = new Timer();
-	// private Date lastServerRequestTime = new Date();
 	private String app_version;
-
-	// We cannot package resources with the jar file and therefor
-	// cannot read the version from the xml
-	private static final String SDK_VERSION = "0.0.2";
 
 	// Called when AdMob requests a CommuteStream Ad
 	@Override
@@ -60,8 +53,6 @@ public class Banner implements CustomEventBanner, AdListener {
 		// the first Banner Request
 		if (!CommuteStream.isInitialized()) {
 
-			Log.v("CS_SDK", "Retrieving Info");
-
 			// Get the versionName of the app using this library
 			try {
 				app_version = activity.getPackageManager().getPackageInfo(
@@ -75,8 +66,6 @@ public class Banner implements CustomEventBanner, AdListener {
 			CommuteStream.setAd_unit_uuid(serverParameter);
 
 			CommuteStream.setApp_ver(app_version);
-			CommuteStream.setSdk_ver(SDK_VERSION);
-			CommuteStream.setSdk_name("com.commutestreamsdk");
 			CommuteStream.setApp_name(activity.getPackageName());
 
 			CommuteStream.setAid_sha(getAndroidIDHash(activity, "SHA1"));
@@ -92,10 +81,10 @@ public class Banner implements CustomEventBanner, AdListener {
 		CommuteStream.setBanner_width(Integer.toString(adSize
 				.getWidthInPixels(activity)));
 
-		CommuteStream.http_params.put("skip_fetch", "false");
+		CommuteStream.setSkip_fetch("false");
 
 		// attempt to get a "banner" from the server
-		RestClient.get("banner", CommuteStream.http_params,
+		RestClient.get("banner", CommuteStream.getHttp_params(),
 				new JsonHttpResponseHandler() {
 
 					@Override
@@ -105,8 +94,6 @@ public class Banner implements CustomEventBanner, AdListener {
 							// update the time of the banner request
 							CommuteStream.reportSuccessfulGet();
 
-							// String banner_request_uuid =
-							// response.getString("banner_request_uuid");
 							String html = response.getString("html");
 							String url = response.getString("url");
 							Boolean item_returned = response
@@ -143,7 +130,6 @@ public class Banner implements CustomEventBanner, AdListener {
 					}
 				});
 
-		// Log.v("CS_SDK", "End of requestBannerAd");
 	}
 
 	private String getAndroidIDHash(Activity activity, String hashing) {
@@ -171,12 +157,11 @@ public class Banner implements CustomEventBanner, AdListener {
 			AdSize adSize, MediationAdRequest request,
 			final Object customEventExtra, String html, final String url) {
 
-
-		Log.v("CS_SDK", "Generating WebView");
+		Log.v("CS_SDK", "Generating Ad WebView");
 		// create a new webview and put the ad in it
 		WebView webView = new WebView(activity);
 
-		//This block allows JS console messages to be transported to LogCat
+		// This block allows JS console messages to be transported to LogCat
 		webView.setWebChromeClient(new WebChromeClient() {
 			public boolean onConsoleMessage(ConsoleMessage cm) {
 				Log.v("CS_SDK_WebView",
@@ -184,30 +169,31 @@ public class Banner implements CustomEventBanner, AdListener {
 				return true;
 			}
 		});
-		
+
 		webView.setVerticalScrollBarEnabled(false);
 		webView.setHorizontalScrollBarEnabled(false);
 		webView.getSettings().setJavaScriptEnabled(true);
 		webView.loadData(html, "text/html", null);
 
-
 		webView.setLayoutParams(new RelativeLayout.LayoutParams(adSize
 				.getWidthInPixels(activity), adSize.getHeightInPixels(activity)));
-		
-		//webView.getSettings().setLoadWithOverviewMode(true);
+
+		// webView.getSettings().setLoadWithOverviewMode(true);
 		webView.getSettings().setUseWideViewPort(true);
+		webView.getSettings().setLoadWithOverviewMode(true);
 		webView.setOnTouchListener(new OnTouchListener() {
 
 			// handle clicks on our new ad
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				try {
-					if(event.getAction() == MotionEvent.ACTION_DOWN){
-						// TODO reenable to record admob clicks
-						// listener.onClick();
-						// listener.onPresentScreen();
-						// listener.onLeaveApplication();
-						Log.v("CS_SDK", "Banner Tapped");
+					if (event.getAction() == MotionEvent.ACTION_DOWN) {
+						//If we are not testing then register all the clicks
+						if(!CommuteStream.getTesting()){
+							listener.onClick();
+							listener.onPresentScreen();
+							listener.onLeaveApplication();
+						}
 						Intent intent = new Intent(Intent.ACTION_VIEW, Uri
 								.parse(url));
 						activity.startActivity(intent);
