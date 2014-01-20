@@ -25,14 +25,14 @@ public class CommuteStream extends Application {
 	private static String banner_height;
 	private static String banner_width;
 	private static String sdk_name = "com.commutestreamsdk";
-	private static String sdk_ver = "0.1.0";
+	private static String sdk_ver = "0.1.1";
 	private static String app_name;
 	private static String app_ver;
 	private static String lat;
 	private static String lon;
 	private static String acc;
 	private static String fix_time;
-	
+
 	private static Location currentBestLocation;
 
 	private static String api_url = "https://api.commutestream.com:3000/";
@@ -49,6 +49,50 @@ public class CommuteStream extends Application {
 	private static Date lastParameterChange = new Date();
 
 	private static Timer parameterCheckTimer = new Timer();
+	private static ParameterUpdateCheckTimer parameterCheckTimerTask = new ParameterUpdateCheckTimer(
+			CommuteStream.lastServerRequestTime) {
+		@Override
+		public void run() {
+			Log.v("CS_SDK", "TIMER FIRED");
+			if (CommuteStream.isInitialized()
+					&& (CommuteStream.lastParameterChange.getTime() > CommuteStream.lastServerRequestTime
+							.getTime())) {
+				Log.v("CS_SDK", "Updating the server.");
+
+				CommuteStream.http_params.put("skip_fetch", "true");
+
+				RestClient.get("banner", CommuteStream.http_params,
+						new JsonHttpResponseHandler() {
+							@Override
+							public void onSuccess(JSONObject response) {
+								CommuteStream.reportSuccessfulGet();
+								// CommuteStream.lastServerRequestTime
+								// =
+								// CommuteStream.lastParameterChange;
+								try {
+									if (response.has("error")) {
+										String error = response
+												.getString("error");
+										Log.e("CS_SDK",
+												"Error from banner server: "
+														+ error);
+									}
+								} catch (JSONException e) {
+									// TODO Auto-generated catch
+									// block
+									e.printStackTrace();
+								}
+							}
+
+							@Override
+							public void onFailure(Throwable e,
+									JSONObject errorResponse) {
+								Log.v("CS_SDK", "UPDATE FAILED");
+							}
+						});
+			}
+		}
+	};
 
 	public static void init() {
 		Log.v("CS_SDK", "init()");
@@ -56,52 +100,13 @@ public class CommuteStream extends Application {
 		// Every few seconds we should check to see if the parameters have been
 		// updated since the last request to the server. If so we should send
 		// the new parameters to ensure the server has the latest user info
-		CommuteStream.parameterCheckTimer.scheduleAtFixedRate(
-				new ParameterUpdateCheckTimer(
-						CommuteStream.lastServerRequestTime) {
-					@Override
-					public void run() {
-						Log.v("CS_SDK", "TIMER FIRED");
-						if (CommuteStream.isInitialized()
-								&& (CommuteStream.lastParameterChange.getTime() > CommuteStream.lastServerRequestTime
-										.getTime())) {
-							Log.v("CS_SDK", "Updating the server.");
+		try {
+			CommuteStream.parameterCheckTimer.scheduleAtFixedRate(CommuteStream.parameterCheckTimerTask, 20000, 20000);
+			Log.v("CS_SDK", "Timer (Re)started");
+		} catch(Exception e) {
+			Log.v("CS_SDK", "Already Initialized");
+		}
 
-							CommuteStream.http_params.put("skip_fetch", "true");
-
-							RestClient.get("banner", CommuteStream.http_params,
-									new JsonHttpResponseHandler() {
-										@Override
-										public void onSuccess(
-												JSONObject response) {
-											CommuteStream.reportSuccessfulGet();
-											// CommuteStream.lastServerRequestTime
-											// =
-											// CommuteStream.lastParameterChange;
-											try {
-												if (response.has("error")) {
-													String error = response
-															.getString("error");
-													Log.e("CS_SDK",
-															"Error from banner server: "
-																	+ error);
-												}
-											} catch (JSONException e) {
-												// TODO Auto-generated catch
-												// block
-												e.printStackTrace();
-											}
-										}
-
-										@Override
-										public void onFailure(Throwable e,
-												JSONObject errorResponse) {
-											Log.v("CS_SDK", "UPDATE FAILED");
-										}
-									});
-						}
-					}
-				}, 20000, 20000);
 	}
 
 	public static String getApp_name() {
@@ -147,6 +152,11 @@ public class CommuteStream extends Application {
 		CommuteStream.api_url = api_url;
 	}
 
+
+	public static void setTheme(String theme) {
+		http_params.put("theme", theme);
+	}
+	
 	public static String getAid_sha() {
 		return CommuteStream.aid_sha;
 	}
@@ -245,8 +255,8 @@ public class CommuteStream extends Application {
 	}
 
 	public static void setLocation(Location location) {
-		//We check that the new location is a better one before sending it
-		if(isBetterLocation(location, CommuteStream.currentBestLocation)){
+		// We check that the new location is a better one before sending it
+		if (isBetterLocation(location, CommuteStream.currentBestLocation)) {
 			CommuteStream.currentBestLocation = location;
 			CommuteStream.lat = Double.toString(location.getLatitude());
 			CommuteStream.lon = Double.toString(location.getLongitude());
