@@ -25,7 +25,7 @@ public class CommuteStream extends Application {
 	private static String banner_height;
 	private static String banner_width;
 	private static String sdk_name = "com.commutestreamsdk";
-	private static String sdk_ver = "0.1.1";
+	private static String sdk_ver = "0.2.1";
 	private static String app_name;
 	private static String app_ver;
 	private static String lat;

@@ -4,6 +4,7 @@ import java.security.MessageDigest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -21,9 +22,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 
 import com.commutestream.ads.http.JsonHttpResponseHandler;
 
-import com.google.ads.Ad;
-import com.google.ads.AdListener;
-import com.google.ads.AdRequest.ErrorCode;
 import com.google.ads.AdSize;
 import com.google.ads.mediation.MediationAdRequest;
 import com.google.ads.mediation.customevent.CustomEventBanner;
@@ -33,11 +31,11 @@ import com.google.ads.mediation.customevent.CustomEventBannerListener;
 //basis for CommuteStream CustomEvent support in AdMob 
 //It's this class that get's instantiated by AdMob when it wants
 //a new ad
-public class Banner implements CustomEventBanner, AdListener {
+public class Banner implements CustomEventBanner {
 
-	private CustomEventBannerListener bannerListener;
 	private WebView adView;
 	private String app_version;
+	//private CustomEventBannerListener bannerListener;
 
 	// Called when AdMob requests a CommuteStream Ad
 	@Override
@@ -47,7 +45,7 @@ public class Banner implements CustomEventBanner, AdListener {
 			final MediationAdRequest request, final Object customEventExtra) {
 
 		// Keep the custom event listener for use later.
-		this.bannerListener = listener;
+		//this.bannerListener = listener;
 
 		// There are some things we need to get from the activity and AdMob on
 		// the first Banner Request
@@ -152,6 +150,7 @@ public class Banner implements CustomEventBanner, AdListener {
 	}
 
 	// does the actual update of the activity
+	@SuppressLint("SetJavaScriptEnabled")
 	private WebView generateWebView(final CustomEventBannerListener listener,
 			final Activity activity, String label, String serverParameter,
 			AdSize adSize, MediationAdRequest request,
@@ -213,28 +212,5 @@ public class Banner implements CustomEventBanner, AdListener {
 		// Clean up custom event variables.
 	}
 
-	@Override
-	public void onDismissScreen(Ad ad) {
-		this.bannerListener.onDismissScreen();
-	}
 
-	@Override
-	public void onFailedToReceiveAd(Ad ad, ErrorCode errorCode) {
-		this.bannerListener.onFailedToReceiveAd();
-	}
-
-	@Override
-	public void onLeaveApplication(Ad ad) {
-		this.bannerListener.onLeaveApplication();
-	}
-
-	@Override
-	public void onPresentScreen(Ad ad) {
-		this.bannerListener.onPresentScreen();
-	}
-
-	@Override
-	public void onReceiveAd(Ad ad) {
-		this.bannerListener.onReceivedAd(this.adView);
-	}
 }

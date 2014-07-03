@@ -2,5 +2,6 @@
     package="com.commutestream.ads"
     android:versionCode="1"
     android:versionName="@string/app_versionName" >
-
+    <uses-sdk android:minSdkVersion="9"
+              android:targetSdkVersion="16" />
 </manifest>
