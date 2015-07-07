@@ -1,9 +1,8 @@
 package com.commutestream.ads;
 
-
-import com.commutestream.ads.http.AsyncHttpClient;
-import com.commutestream.ads.http.AsyncHttpResponseHandler;
-import com.commutestream.ads.http.RequestParams;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 
 public class RestClient {
 
