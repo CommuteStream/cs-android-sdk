@@ -35,7 +35,7 @@ import java.security.MessageDigest;
 public class Banner implements CustomEventBanner {
 
     private WebView adView;
-    private String app_version;
+    private String appVersion;
     //private CustomEventBannerListener bannerListener;
 
     // Called when AdMob requests a CommuteStream Ad
@@ -54,7 +54,7 @@ public class Banner implements CustomEventBanner {
 
             // Get the versionName of the app using this library
             try {
-                app_version = activity.getPackageManager().getPackageInfo(
+                appVersion = activity.getPackageManager().getPackageInfo(
                         activity.getPackageName(), 0).versionName;
             } catch (NameNotFoundException e2) {
                 // TODO Auto-generated catch block
@@ -62,73 +62,44 @@ public class Banner implements CustomEventBanner {
             }
 
             // set the the parameter specified in AdMob
-            CommuteStream.setAd_unit_uuid(serverParameter);
+            CommuteStream.setAdUnitUuid(serverParameter);
 
-            CommuteStream.setApp_ver(app_version);
-            CommuteStream.setApp_name(activity.getPackageName());
+            CommuteStream.setAppVersion(appVersion);
+            CommuteStream.setAppName(activity.getPackageName());
 
-            CommuteStream.setAid_sha(getAndroidIDHash(activity, "SHA1"));
-            CommuteStream.setAid_md5(getAndroidIDHash(activity, "MD5"));
+            CommuteStream.setAidSha(getAndroidIDHash(activity, "SHA1"));
+            CommuteStream.setAidMd5(getAndroidIDHash(activity, "MD5"));
 
             // set init so we don't do this stuff again
             CommuteStream.setInitialized(true);
         }
 
         // set the banner height
-        CommuteStream.setBanner_height(Integer.toString(adSize
-                .getHeightInPixels(activity)));
-        CommuteStream.setBanner_width(Integer.toString(adSize
-                .getWidthInPixels(activity)));
+        CommuteStream.setBannerHeight(adSize.getHeightInPixels(activity));
+        CommuteStream.setBannerWidth(adSize.getWidthInPixels(activity));
 
-        CommuteStream.setSkip_fetch("false");
+        CommuteStream.getClient().getAd(CommuteStream.nextRequest(), new AdResponseHandler() {
+            @Override
+            public void onSuccess(AdResponse response) {
+                // if there is something that the server wants us to
+                // display we generate a webview for it and pass it
+                // on to admob
+                if (response.html != null) {
+                    adView = generateWebView(listener, activity,
+                            label, serverParameter, adSize,
+                            request, customEventExtra, response.getHtml(), response.getUrl());
+                    listener.onReceivedAd(adView);
+                } else {
+                    listener.onFailedToReceiveAd();
+                }
+            }
 
-        // attempt to get a "banner" from the server
-        RestClient.get("banner", CommuteStream.getHttp_params(),
-                new JsonHttpResponseHandler() {
-
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        try {
-
-                            // update the time of the banner request
-                            CommuteStream.reportSuccessfulGet();
-
-                            String html = response.getString("html");
-                            String url = response.getString("url");
-                            Boolean item_returned = response
-                                    .getBoolean("item_returned");
-
-                            if (response.has("error")) {
-                                String error = response.getString("error");
-                                Log.e("CS_SDK", "Error from banner server: "
-                                        + error);
-                            }
-
-                            // if there is something that the server wants us to
-                            // display we generate a webview for it and pass it
-                            // on to admob
-                            if (item_returned) {
-                                adView = generateWebView(listener, activity,
-                                        label, serverParameter, adSize,
-                                        request, customEventExtra, html, url);
-                                listener.onReceivedAd(adView);
-                            } else {
-                                listener.onFailedToReceiveAd();
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                            listener.onFailedToReceiveAd();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject errorResponse) {
-                        Log.v("CS_SDK", "FETCH FAILED");
-                        listener.onFailedToReceiveAd();
-                    }
-                });
-
+            @Override
+            public void onError(Throwable error){
+                Log.v("CS_SDK", "FAILED_FETCH");
+                listener.onFailedToReceiveAd();
+            }
+        });
     }
 
     private String getAndroidIDHash(Activity activity, String hashing) {
@@ -143,7 +114,6 @@ public class Banner implements CustomEventBanner {
             MessageDigest md = MessageDigest.getInstance(hashing);
             byte[] hashBytes = md.digest(mmdid.getBytes());
             hex = Base64.encodeToString(hashBytes, 0, hashBytes.length, 0);
-
         } catch (Exception e) {
             return null;
         }
@@ -189,7 +159,7 @@ public class Banner implements CustomEventBanner {
                 try {
                     if (event.getAction() == MotionEvent.ACTION_DOWN) {
                         //If we are not testing then register all the clicks
-                        if (!CommuteStream.getTesting()) {
+                        if (!CommuteStream.getTestingFlag()) {
                             listener.onClick();
                             listener.onPresentScreen();
                             listener.onLeaveApplication();
