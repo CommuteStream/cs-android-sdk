@@ -84,7 +84,7 @@ public class Banner implements CustomEventBanner {
                 // if there is something that the server wants us to
                 // display we generate a webview for it and pass it
                 // on to admob
-                if (response.html != null) {
+                if (response.getHtml() != null) {
                     adView = generateWebView(listener, activity,
                             label, serverParameter, adSize,
                             request, customEventExtra, response.getHtml(), response.getUrl());

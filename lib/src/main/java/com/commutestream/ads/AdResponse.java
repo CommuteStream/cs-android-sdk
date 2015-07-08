@@ -4,8 +4,13 @@ package com.commutestream.ads;
  * AdResponse contains the response data about an ad request
  */
 class AdResponse {
-    String html;
-    String url;
+    private String html;
+    private String url;
+
+    AdResponse(String html, String url) {
+        this.html = html;
+        this.url = url;
+    }
 
     /**
      * Get the Ad URL

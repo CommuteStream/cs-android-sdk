@@ -27,9 +27,7 @@ class HttpClient implements Client {
                     if(response.has("error")) {
                         adHandler.onError(new Exception(response.getString("error")));
                     } else {
-                        AdResponse adResponse = new AdResponse();
-                        adResponse.html = response.getString("html");
-                        adResponse.url = response.getString("url");
+                        AdResponse adResponse = new AdResponse(response.getString("html"), response.getString("url"));
                         adHandler.onSuccess(adResponse);
                     }
                 } catch (JSONException e) {
