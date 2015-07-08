@@ -1,14 +1,12 @@
 package com.commutestream.ads;
 
-import android.app.Activity;
-import android.location.Location;
-import android.test.InstrumentationTestCase;
+import junit.framework.TestCase;
 
 /**
  * AdRequestTest
  */
-public class AdRequestTest extends InstrumentationTestCase {
-    public void testPersistent() throws Exception {
+public class AdRequestTest extends TestCase {
+    public static AdRequest mockedRequest() {
         AdRequest req = new AdRequest();
         req.sdkName = "sdkName";
         req.sdkVersion = "sdkVersion";
@@ -20,6 +18,11 @@ public class AdRequestTest extends InstrumentationTestCase {
         req.testing = false;
         req.bannerHeight = 500;
         req.bannerWidth = 200;
+        return req;
+    }
+
+    public void testPersistent() throws Exception {
+        AdRequest req = mockedRequest();
         req.agencyInterests.add(new AgencyInterest(AgencyInterest.FAVORITE_ADDED, "cta", "red", "445"));
         req.skipFetch = true;
         //req.location =
