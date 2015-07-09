@@ -24,7 +24,7 @@ import java.util.Timer;
 public class CommuteStream extends Application {
     private static boolean initialized = false;
     private static HttpClient httpClient;
-    private static AdRequest request;
+    private static AdRequest request = new AdRequest();
     private static Date swapped = new Date();
     private static Date modified = new Date();
 
@@ -54,7 +54,7 @@ public class CommuteStream extends Application {
         //TODO use a config setting to determine which client to use
         return getHttpClient();
     }
-    
+
     /**
      * Get the CommuteStream API Singleton HTTP Client
      * @return httpClient
