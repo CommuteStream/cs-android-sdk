@@ -23,7 +23,7 @@ import java.util.Timer;
 
 public class CommuteStream extends Application {
     private static boolean initialized = false;
-    private static Client client;
+    private static HttpClient httpClient;
     private static AdRequest request;
     private static Date swapped = new Date();
     private static Date modified = new Date();
@@ -50,11 +50,28 @@ public class CommuteStream extends Application {
      * Get the CommuteStream API Singleton Client
      * @return client
      */
-    public static Client getClient() {
-        if(client == null) {
-            client = new HttpClient();
+    public static synchronized Client getClient() {
+        //TODO use a config setting to determine which client to use
+        return getHttpClient();
+    }
+    
+    /**
+     * Get the CommuteStream API Singleton HTTP Client
+     * @return httpClient
+     */
+    static HttpClient getHttpClient() {
+        if(httpClient == null) {
+            httpClient = new HttpClient();
         }
-        return client;
+        return httpClient;
+    }
+
+    /**
+     * Set the CommuteStream API URL to use with the HTTP client
+     * @param baseURL
+     */
+    public static void setBaseURL(String baseURL) {
+        getHttpClient().setBaseURL(baseURL);
     }
 
     /**
