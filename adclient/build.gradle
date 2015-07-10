@@ -1,6 +1,10 @@
 apply plugin: 'com.android.library'
 
-version = "0.3.0"
+ext {
+	PUBLISH_GROUP_ID = 'com.commutestream.ads'
+	PUBLISH_ARTIFACT_ID = 'adclient'
+	PUBLISH_VERSION = '0.3.0'
+}
 
 android {
     compileSdkVersion 22
@@ -24,3 +28,5 @@ dependencies {
     compile 'com.google.android.gms:play-services:7.5.+'
     compile 'com.loopj.android:android-async-http:1.4.+'
 }
+
+apply from :'android-release-aar.gradle'
