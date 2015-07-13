@@ -18,13 +18,15 @@ class AdRequestURLEncoder {
         params.put("banner_height", request.bannerHeight);
         params.put("banner_width", request.bannerWidth);
         params.put("ad_unit_uuid", request.adUnitUuid);
-        if(request.location != null) {
+        if (request.location != null) {
             params.put("lat", request.location.getLatitude());
             params.put("lon", request.location.getLongitude());
             params.put("acc", request.location.getAccuracy());
             params.put("fix_time", request.location.getTime());
         }
-        params.put("testing", request.testing);
+        if (request.testing) {
+            params.put("testing", request.testing);
+        }
         params.put("agency_interest", AgencyInterestCSVEncoder.Encode(request.agencyInterests));
         return params;
     }

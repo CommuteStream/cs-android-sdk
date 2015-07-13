@@ -13,10 +13,10 @@ class AgencyInterestCSVEncoder {
 
     static String Encode(Collection<AgencyInterest> agencyInterests) {
         StringBuilder builder = new StringBuilder();
-        for(Iterator<AgencyInterest> iter = agencyInterests.iterator(); iter.hasNext();) {
+        for (Iterator<AgencyInterest> iter = agencyInterests.iterator(); iter.hasNext(); ) {
             AgencyInterest agencyInterest = iter.next();
             builder.append(Encode(agencyInterest));
-            if(iter.hasNext()) {
+            if (iter.hasNext()) {
                 builder.append(",");
             }
         }

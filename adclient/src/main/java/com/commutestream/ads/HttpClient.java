@@ -1,5 +1,7 @@
 package com.commutestream.ads;
 
+import android.util.Log;
+
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -23,20 +25,22 @@ class HttpClient implements Client {
         client.get(getAbsoluteUrl("banner"), params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Log.v("CS_SDK", "Ad request successful");
                 try {
-                    if(response.has("error")) {
-                        adHandler.onError(new Exception(response.getString("error")));
-                    } else {
-                        AdResponse adResponse = new AdResponse(response.getString("html"), response.getString("url"));
-                        adHandler.onSuccess(adResponse);
+                    if (response.has("error")) {
+                        Log.v("CS_SDK", "error is " + response.getString("error"));
                     }
+                    AdResponse adResponse = new AdResponse(response.getString("html"), response.getString("url"));
+                    adHandler.onSuccess(adResponse);
                 } catch (JSONException e) {
+                    Log.v("CS_SDK", "JSON Exception " + e.toString());
                     adHandler.onError(e);
                 }
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
+                Log.v("CS_SDK", "Ad request failure");
                 adHandler.onError(e);
             }
         });
@@ -44,6 +48,7 @@ class HttpClient implements Client {
 
     /**
      * Get the current base API URL for the HttpClient
+     *
      * @return baseURL
      */
     public synchronized String getBaseURL() {
@@ -53,6 +58,7 @@ class HttpClient implements Client {
     /**
      * Sets the current API URL for HttpClient, should always end in a /
      * Example: https://api,commutestream.com/
+     *
      * @param baseURL
      */
     public void setBaseURL(String baseURL) {

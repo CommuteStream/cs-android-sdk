@@ -4,16 +4,7 @@ import android.app.Application;
 import android.location.Location;
 import android.util.Log;
 
-import com.loopj.android.http.JsonHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
-
-import org.apache.http.Header;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Timer;
 
 //This application extension is where we store things that 
@@ -48,6 +39,7 @@ public class CommuteStream extends Application {
 
     /**
      * Get the CommuteStream API Singleton Client
+     *
      * @return client
      */
     public static synchronized Client getClient() {
@@ -57,10 +49,11 @@ public class CommuteStream extends Application {
 
     /**
      * Get the CommuteStream API Singleton HTTP Client
+     *
      * @return httpClient
      */
     static HttpClient getHttpClient() {
-        if(httpClient == null) {
+        if (httpClient == null) {
             httpClient = new HttpClient();
         }
         return httpClient;
@@ -68,6 +61,7 @@ public class CommuteStream extends Application {
 
     /**
      * Set the CommuteStream API URL to use with the HTTP client
+     *
      * @param baseURL
      */
     public static void setBaseURL(String baseURL) {
@@ -76,6 +70,7 @@ public class CommuteStream extends Application {
 
     /**
      * Checks if the CommuteStream SDK has been initialized
+     *
      * @return true if initialized, false otherwise
      */
     public static boolean isInitialized() {
@@ -84,6 +79,7 @@ public class CommuteStream extends Application {
 
     /**
      * Get the ad unit UUID
+     *
      * @return adUnitUuid
      */
     public static synchronized String getAdUnitUuid() {
@@ -92,6 +88,7 @@ public class CommuteStream extends Application {
 
     /**
      * Set the ad unit UUID
+     *
      * @param adUnitUuid
      */
     public static synchronized void setAdUnitUuid(String adUnitUuid) {
@@ -100,6 +97,7 @@ public class CommuteStream extends Application {
 
     /**
      * Get the applicatio name
+     *
      * @return appName
      */
     public static synchronized String getAppName() {
@@ -108,6 +106,7 @@ public class CommuteStream extends Application {
 
     /**
      * Set the application name
+     *
      * @param appName
      */
     public static synchronized void setAppName(String appName) {
@@ -116,6 +115,7 @@ public class CommuteStream extends Application {
 
     /**
      * Get the application version
+     *
      * @return appVersion
      */
     public static synchronized String getAppVersion() {
@@ -124,6 +124,7 @@ public class CommuteStream extends Application {
 
     /**
      * Set the application name
+     *
      * @param appVersion
      */
     public static synchronized void setAppVersion(String appVersion) {
@@ -132,6 +133,7 @@ public class CommuteStream extends Application {
 
     /**
      * Get the SDK Name
+     *
      * @return sdkName
      */
     public static synchronized String getSdkName() {
@@ -140,6 +142,7 @@ public class CommuteStream extends Application {
 
     /**
      * Get the SDK Version string
+     *
      * @return sdkVersion
      */
     public static synchronized String getSdkVersion() {
@@ -148,6 +151,7 @@ public class CommuteStream extends Application {
 
     /**
      * Set the theme to use (dark or light) for ad templates
+     *
      * @param theme
      */
     public static synchronized void setTheme(String theme) {
@@ -156,6 +160,7 @@ public class CommuteStream extends Application {
 
     /**
      * Get the android device ID SHA hash
+     *
      * @return aidSha
      */
     public static synchronized String getAidSha() {
@@ -164,6 +169,7 @@ public class CommuteStream extends Application {
 
     /**
      * Set the android device ID SHA hash
+     *
      * @param aidSha
      */
     public static synchronized void setAidSha(String aidSha) {
@@ -172,6 +178,7 @@ public class CommuteStream extends Application {
 
     /**
      * Get the android device ID MD5 hash sum value
+     *
      * @return aidMd5
      */
     public static synchronized String getAidMd5() {
@@ -180,6 +187,7 @@ public class CommuteStream extends Application {
 
     /**
      * Set the android device ID MD5 hash sum value
+     *
      * @param aidMd5
      */
     public static synchronized void setAidMd5(String aidMd5) {
@@ -188,6 +196,7 @@ public class CommuteStream extends Application {
 
     /**
      * Get the banner height
+     *
      * @return bannerHeight
      */
     public static synchronized int getBannerHeight() {
@@ -196,6 +205,7 @@ public class CommuteStream extends Application {
 
     /**
      * Set the banner height
+     *
      * @param bannerHeight
      */
     public static synchronized void setBannerHeight(int bannerHeight) {
@@ -204,6 +214,7 @@ public class CommuteStream extends Application {
 
     /**
      * Get the banner width
+     *
      * @return bannerWidth
      */
     public static synchronized int getBannerWidth() {
@@ -212,6 +223,7 @@ public class CommuteStream extends Application {
 
     /**
      * Set the banner width
+     *
      * @param bannerWidth
      */
     public static synchronized void setBannerWidth(int bannerWidth) {
@@ -221,10 +233,11 @@ public class CommuteStream extends Application {
     /**
      * Return the next AdRequest to perform,
      * The return may be null if no modifications have occurs since the last swap.
+     *
      * @return request
      */
     public static synchronized AdRequest nextRequest() {
-        if(isInitialized() && CommuteStream.modified.compareTo(CommuteStream.swapped) > 0) {
+        if (isInitialized() && CommuteStream.modified.compareTo(CommuteStream.swapped) > 0) {
             AdRequest nextRequest = CommuteStream.request;
             CommuteStream.request = new AdRequest();
             CommuteStream.swapped = new Date();
@@ -235,6 +248,7 @@ public class CommuteStream extends Application {
 
     /**
      * Tell CommuteStream that transit tracking information has been displayed
+     *
      * @param agencyID
      * @param routeID
      * @param stopID
@@ -246,6 +260,7 @@ public class CommuteStream extends Application {
 
     /**
      * Tell CommuteStream that a transit alert has been displayed
+     *
      * @param agencyID
      * @param routeID
      * @param stopID
@@ -257,6 +272,7 @@ public class CommuteStream extends Application {
 
     /**
      * Tell CommuteStream that a transit map has been displayed
+     *
      * @param agencyID
      * @param routeID
      * @param stopID
@@ -268,6 +284,7 @@ public class CommuteStream extends Application {
 
     /**
      * Tell CommuteStream that a favorite transit stop/route has been displayed
+     *
      * @param agencyID
      * @param routeID
      * @param stopID
@@ -279,6 +296,7 @@ public class CommuteStream extends Application {
 
     /**
      * Tell CommuteStream that a begin trip planning point has been used
+     *
      * @param agencyID
      * @param routeID
      * @param stopID
@@ -290,6 +308,7 @@ public class CommuteStream extends Application {
 
     /**
      * Tell CommuteStream that a end trip planning point has been used
+     *
      * @param agencyID
      * @param routeID
      * @param stopID
@@ -301,6 +320,7 @@ public class CommuteStream extends Application {
 
     /**
      * Sets the current device location
+     *
      * @param location
      */
     public static synchronized void setLocation(Location location) {
@@ -312,6 +332,7 @@ public class CommuteStream extends Application {
 
     /**
      * Get the testing flag
+     *
      * @return testing
      */
     public static synchronized Boolean getTestingFlag() {
@@ -323,11 +344,12 @@ public class CommuteStream extends Application {
      */
     public static synchronized void setTestingFlag(Boolean testing) {
         CommuteStream.request.testing = testing;
-        Log.v("CS_SDK", "Testing Mode Set");
+        Log.v("CS_SDK", "Testing Flag Set to " + Boolean.toString(testing));
     }
 
     /**
      * Set the initialized flag
+     *
      * @param initialized
      */
     static void setInitialized(boolean initialized) {
@@ -337,6 +359,7 @@ public class CommuteStream extends Application {
     /**
      * Adds an agency interest to a queue of agency interests that gets sent and cleared on
      * each request made.
+     *
      * @param agencyInterest
      */
     private static synchronized void addAgencyInterest(AgencyInterest agencyInterest) {
@@ -370,7 +393,7 @@ public class CommuteStream extends Application {
      *                            one
      */
     private static boolean isBetterLocation(Location location,
-                                              Location currentBestLocation) {
+                                            Location currentBestLocation) {
         if (currentBestLocation == null) {
             // A new location is always better than no location
             return true;

@@ -5,5 +5,6 @@ package com.commutestream.ads;
  */
 interface AdResponseHandler {
     void onSuccess(AdResponse response);
+
     void onError(Throwable error);
 }

@@ -14,6 +14,7 @@ class AdResponse {
 
     /**
      * Get the Ad URL
+     *
      * @return url
      */
     public String getUrl() {
@@ -22,6 +23,7 @@ class AdResponse {
 
     /**
      * Get the Ad HTML to Embed in a WebView
+     *
      * @return html
      */
     public String getHtml() {

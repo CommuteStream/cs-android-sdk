@@ -67,11 +67,13 @@ public class Banner implements CustomEventBanner {
 
             // set init so we don't do this stuff again
             CommuteStream.setInitialized(true);
+            Log.v("CS_SDK", "initialized SDK");
         }
 
         // set the banner height
         CommuteStream.setBannerHeight(adSize.getHeightInPixels(activity));
         CommuteStream.setBannerWidth(adSize.getWidthInPixels(activity));
+
 
         CommuteStream.getClient().getAd(CommuteStream.nextRequest(), new AdResponseHandler() {
             @Override
@@ -90,7 +92,7 @@ public class Banner implements CustomEventBanner {
             }
 
             @Override
-            public void onError(Throwable error){
+            public void onError(Throwable error) {
                 Log.v("CS_SDK", "FAILED_FETCH");
                 listener.onFailedToReceiveAd();
             }
