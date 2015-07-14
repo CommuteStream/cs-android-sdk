@@ -1,5 +1,6 @@
 package com.commutestream.ads;
 
+import android.os.Looper;
 import android.util.Log;
 
 import com.loopj.android.http.AsyncHttpClient;
@@ -20,30 +21,37 @@ class HttpClient implements Client {
 
     @Override
     public synchronized void getAd(AdRequest request, final AdResponseHandler adHandler) {
+        if(Looper.myLooper() == null ) {
+            Looper.prepare();
+        }
         // Encode the request parameters
         RequestParams params = AdRequestURLEncoder.Encode(request);
-        client.get(getAbsoluteUrl("banner"), params, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.v("CS_SDK", "Ad request successful");
-                try {
-                    if (response.has("error")) {
-                        Log.v("CS_SDK", "error is " + response.getString("error"));
+        try {
+            client.get(getAbsoluteUrl("banner"), params, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    Log.v("CS_SDK", "Ad request successful");
+                    try {
+                        if (response.has("error")) {
+                            Log.v("CS_SDK", "error is " + response.getString("error"));
+                        }
+                        AdResponse adResponse = new AdResponse(response.getString("html"), response.getString("url"));
+                        adHandler.onSuccess(adResponse);
+                    } catch (JSONException e) {
+                        Log.v("CS_SDK", "Ad request JSONException " + e.toString());
+                        adHandler.onError(e);
                     }
-                    AdResponse adResponse = new AdResponse(response.getString("html"), response.getString("url"));
-                    adHandler.onSuccess(adResponse);
-                } catch (JSONException e) {
-                    Log.v("CS_SDK", "JSON Exception " + e.toString());
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
+                    Log.v("CS_SDK", "Ad request failure: " + e.toString());
                     adHandler.onError(e);
                 }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
-                Log.v("CS_SDK", "Ad request failure");
-                adHandler.onError(e);
-            }
-        });
+            });
+        } catch(Exception e) {
+            Log.v("CS_SDK", "Ad request failure: " + e.toString());
+        }
     }
 
     /**
