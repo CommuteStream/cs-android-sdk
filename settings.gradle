@@ -1,1 +1,1 @@
-include ':adclient'
+include ':sdk'
