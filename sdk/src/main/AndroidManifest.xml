@@ -1,7 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.commutestream.ads"
-    android:versionCode="1"
-    android:versionName="@string/app_versionName" >
-    <uses-sdk android:minSdkVersion="9"
-              android:targetSdkVersion="16" />
+    package="com.commutestream.sdk"
+    android:versionCode="1">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <service android:name=".CommuteStream" ></service>
+
 </manifest>

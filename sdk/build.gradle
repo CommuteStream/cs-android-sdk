@@ -1,32 +1,38 @@
 apply plugin: 'com.android.library'
 
 ext {
-	PUBLISH_GROUP_ID = 'com.commutestream.ads'
+	PUBLISH_GROUP_ID = 'com.commutestream.sdk'
 	PUBLISH_ARTIFACT_ID = 'commutestream-sdk'
-	PUBLISH_VERSION = '0.3.0'
+	PUBLISH_VERSION = '0.4.0-beta1'
 }
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
-
+    compileSdkVersion 23
+    buildToolsVersion "23.0.0"
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 22
+        targetSdkVersion 23
+        versionCode 1
+        versionName PUBLISH_VERSION
+        testApplicationId "com.commutestream.sdk.test"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:22.2.+'
-    compile 'com.google.android.gms:play-services:7.5.+'
-    compile 'com.loopj.android:android-async-http:1.4.7'
+    compile 'com.google.android.gms:play-services-ads:7.8.0'
+    compile 'com.squareup.okhttp:okhttp:2.5.0'
+    compile 'com.squareup.retrofit:retrofit:2.0.0-beta1'
+    compile 'com.squareup.retrofit:converter-gson:2.0.0-beta1'
+    testCompile "junit:junit:4.12"
+    testCompile "org.assertj:assertj-core:1.7.0"
+    testCompile 'com.squareup.okhttp:mockwebserver:2.5.0'
 }
 
 apply from :'android-release-aar.gradle'

@@ -6,7 +6,7 @@ as a source of AdMob mediated banner advertising in Android applications.
 ## Building Release
 
 ``` sh
-gradle sdk:zipRelease
+gradle sdk:generateRelease:
 ```
 
 The release .aar file is then in sdk/build/release
