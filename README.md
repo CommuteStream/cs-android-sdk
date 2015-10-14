@@ -12,7 +12,7 @@ gradle sdk:generateRelease:
 The release .zip can be found in sdk/build/ and when unzipped contains a
 valid maven repository structure that may be hosted anywhere including locally.
 
-## Test Applicationcd
+## Test Application
 
 The project includes in it a test application which may be used to actively generate randomized
 transit interest and android device ids while then showing ads. This is useful in showing the SDK
