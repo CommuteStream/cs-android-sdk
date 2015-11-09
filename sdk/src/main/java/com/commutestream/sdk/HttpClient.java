@@ -45,8 +45,13 @@ class HttpClient implements Client {
         Callback<AdResponse> callback = new Callback<AdResponse>() {
             @Override
             public void onResponse(Response<AdResponse> response) {
-                Log.v("CS_SDK", "Ad request successful: " + response.body().toString());
-                adHandler.onSuccess(response.body());
+                if(response.body() != null) {
+                    Log.v("CS_SDK", "Ad request successful: " + response.body().toString());
+                    adHandler.onSuccess(response.body());
+                } else {
+                    Log.v("CS_SDK", "Ad request null response, HTTP Code: " + response.code() + " , Raw Body: " + response.raw());
+                    adHandler.onError(new Exception("Empty or Incorrect HTTP Response"));
+                }
             }
 
             @Override
