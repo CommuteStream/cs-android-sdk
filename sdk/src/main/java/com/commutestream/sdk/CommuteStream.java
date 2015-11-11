@@ -542,7 +542,7 @@ public class CommuteStream {
         try {
             MessageDigest md = MessageDigest.getInstance(algorithm);
             byte[] hashBytes = md.digest(other.getBytes());
-            hashed = Base64.encodeToString(hashBytes, 0, hashBytes.length, 0);
+            hashed = Base64.encodeToString(hashBytes, 0, hashBytes.length, Base64.NO_WRAP);
         } catch (Exception e) {
             return null;
         }
