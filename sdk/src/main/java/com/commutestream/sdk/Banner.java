@@ -43,11 +43,12 @@ public class Banner implements CustomEventBanner {
         CommuteStream.setBannerWidth(size.getWidthInPixels(context));
         CommuteStream.requestAd(new AdResponseHandler() {
             @Override
-            public void onSuccess(AdResponse response) {
+            public void onSuccess(AdResponse response, double requestTime) {
                 // if there is something that the server wants us to
                 // display we generate a webview for it and pass it
                 // on to admob
                 if (response.getHtml() != null) {
+                    Log.v("CS_SDK", "BANNER REQUEST SUCCEESS, TOOK: " + requestTime + "ms");
                     adView = generateWebView(listener, context,
                             serverParameter, size,
                             mediationAdRequest,

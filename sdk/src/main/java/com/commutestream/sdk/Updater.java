@@ -13,11 +13,11 @@ public class Updater extends TimerTask {
         Log.v("CS_SDK", "TIMER FIRED");
         CommuteStream.requestUpdate(new AdResponseHandler() {
             @Override
-            public void onSuccess(AdResponse response) {
+            public void onSuccess(AdResponse response, double requestTime) {
                 if(response.getError() != null) {
                     Log.v("CS_SDK", "UPDATE ERROR MESSAGE: " + response.getError());
                 } else {
-                    Log.v("CS_SDK", "UPDATE SUCCEEDED");
+                    Log.v("CS_SDK", "UPDATE SUCCEEDED, TOOK: " + requestTime + "ms");
                 }
             }
 
