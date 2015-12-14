@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * if it's within a view that gets destroyed and re-created
  */
 public class CommuteStream {
-    // Location helper stuff
+    private static final String version = "0.6.0";
     private static final int TWO_MINUTES = 1000 * 60 * 2;
     private static boolean initialized = false;
     private static HttpClient httpClient;
@@ -42,6 +42,7 @@ public class CommuteStream {
      * @param adUnit ad unit uuid
      */
     public synchronized static void init(Context context, String adUnit) {
+        CommuteStream.setSdkVersion(CommuteStream.version);
         CommuteStream.setAppName(ContextUtils.getAppName(context));
         CommuteStream.setAppVersion(ContextUtils.getAppVersion(context));
         CommuteStream.setAid(ContextUtils.getAndroidID(context));
@@ -154,10 +155,10 @@ public class CommuteStream {
     /**
      * Get the SDK Version string
      *
-     * @return sdkVersion
+     * @param version
      */
-    public static synchronized String getSdkVersion() {
-        return CommuteStream.request.getSdkVersion();
+    private static synchronized void setSdkVersion(String version) {
+        CommuteStream.request.setSdkVersion(version);
     }
 
     /**
