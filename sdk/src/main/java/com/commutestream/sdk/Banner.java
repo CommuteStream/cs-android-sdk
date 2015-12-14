@@ -115,26 +115,57 @@ public class Banner implements CustomEventBanner {
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.setOnTouchListener(new OnTouchListener() {
+            public final static int FINGER_RELEASED = 0;
+            public final static int FINGER_TOUCHED = 1;
+            public final static int FINGER_DRAGGING = 2;
+            public final static int FINGER_UNDEFINED = 3;
 
-            // handle clicks on our new ad
+            private int fingerState = FINGER_RELEASED;
+
+
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                try {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        //If we are not testing then register all the clicks
-                        if (!CommuteStream.getTestingFlag()) {
-                            listener.onAdClicked();
-                            listener.onAdLeftApplication();
-                        }
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri
-                                .parse(url));
-                        context.startActivity(intent);
-                    }
-                } catch (Throwable t) {
-                    // Something went wrong, oh well.
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+
+                switch (motionEvent.getAction()) {
+
+                    case MotionEvent.ACTION_DOWN:
+                        if (fingerState == FINGER_RELEASED) fingerState = FINGER_TOUCHED;
+                        else fingerState = FINGER_UNDEFINED;
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        if (fingerState != FINGER_DRAGGING) {
+                            fingerState = FINGER_RELEASED;
+                            try {
+                                if (!CommuteStream.getTestingFlag()) {
+                                    listener.onAdClicked();
+                                    listener.onAdLeftApplication();
+                                } else {
+                                    Log.v("CS_SDK", "TEST AD CLICKED!");
+                                }
+                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri
+                                        .parse(url));
+                                context.startActivity(intent);
+                            } catch (Throwable t) {
+                                // Something went wrong, oh well.
+                            }
+                        } else if (fingerState == FINGER_DRAGGING) fingerState = FINGER_RELEASED;
+                        else fingerState = FINGER_UNDEFINED;
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        if (fingerState == FINGER_TOUCHED || fingerState == FINGER_DRAGGING)
+                            fingerState = FINGER_DRAGGING;
+                        else fingerState = FINGER_UNDEFINED;
+                        break;
+
+                    default:
+                        fingerState = FINGER_UNDEFINED;
                 }
+
                 return false;
             }
+
         });
         return webView;
 
