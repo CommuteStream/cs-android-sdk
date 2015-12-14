@@ -43,15 +43,18 @@ public class Banner implements CustomEventBanner {
         CommuteStream.setBannerWidth(size.getWidthInPixels(context));
         CommuteStream.requestAd(new AdResponseHandler() {
             @Override
-            public void onSuccess(AdResponse response) {
+            public void onSuccess(AdResponse response, double requestTime) {
                 // if there is something that the server wants us to
                 // display we generate a webview for it and pass it
                 // on to admob
                 if (response.getHtml() != null) {
+                    Log.v("CS_SDK", "BANNER REQUEST SUCCEESS, TOOK: " + requestTime + "ms");
                     adView = generateWebView(listener, context,
                             serverParameter, size,
                             mediationAdRequest,
-                            response.getHtml(), response.getUrl());
+                            response.getHtml(),
+                            response.getUrl(),
+                            requestTime);
                     listener.onAdLoaded(adView);
                 } else if (response.getError() != null) {
                     Log.v("CS_SDK", "Response had an error " + response.getError());
@@ -80,9 +83,14 @@ public class Banner implements CustomEventBanner {
                                     final AdSize size,
                                     final MediationAdRequest request,
                                     final String html,
-                                    final String url) {
+                                    final String url,
+                                    final double requestTime) {
 
         Log.v("CS_SDK", "Generating Ad WebView");
+
+        // Set the JS var for the request time, since its done in Java
+        final String html2 = html.replace("var loadTimeBanner = null;", "var loadTimeBanner = " + Math.round(requestTime) + ";");
+
         // create a new webview and put the ad in it
         WebView webView = new WebView(context);
 
@@ -98,7 +106,7 @@ public class Banner implements CustomEventBanner {
         webView.setVerticalScrollBarEnabled(false);
         webView.setHorizontalScrollBarEnabled(false);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadData(html, "text/html", null);
+        webView.loadData(html2, "text/html", null);
 
         webView.setLayoutParams(new RelativeLayout.LayoutParams(size.getWidthInPixels(context),
                 size.getHeightInPixels(context)));
