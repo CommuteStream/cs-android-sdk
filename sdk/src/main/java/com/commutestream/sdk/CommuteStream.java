@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
  * if it's within a view that gets destroyed and re-created
  */
 public class CommuteStream {
+    private static int requestsBeforeInit = 0;
     private static final String version = "0.6.0";
     private static final int TWO_MINUTES = 1000 * 60 * 2;
     private static boolean initialized = false;
@@ -367,6 +368,15 @@ public class CommuteStream {
      */
     private synchronized static void scheduleUpdate() {
         Log.v("CS_SDK", "Schedule Update");
+
+        if(!isInitialized()) {
+            requestsBeforeInit += 1;
+        }
+
+        if(getTestingFlag() && !isInitialized() && requestsBeforeInit > 4) {
+            Log.e("CS_SDK", "SDK has pending requests but is not yet initialized, possible AdMob Mediation or Proguard Rule Issue!\n" +
+                    "See documentation at https://commutestream.com/sdkinstructions regarding Proguard rules and Admob Mediation Settings");
+        }
 
         // if an update is already pending or the sdk is not initialized fully yet then don't bother
         // scheduling the timer.
