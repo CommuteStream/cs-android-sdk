@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class CommuteStream {
     private static int requestsBeforeInit = 0;
-    private static final String version = "0.6.0";
+    private static final String version = "0.6.1";
     private static final int TWO_MINUTES = 1000 * 60 * 2;
     private static boolean initialized = false;
     private static HttpClient httpClient;
