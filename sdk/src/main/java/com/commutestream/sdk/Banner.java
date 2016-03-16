@@ -119,43 +119,72 @@ public class Banner implements CustomEventBanner {
             public final static int FINGER_TOUCHED = 1;
             public final static int FINGER_DRAGGING = 2;
             public final static int FINGER_UNDEFINED = 3;
+            public final static double MAX_DISTANCE = 20.0;
 
             private int fingerState = FINGER_RELEASED;
+            private double distanceMoved = 0.0;
+            private double lastX = 0.0;
+            private double lastY = 0.0;
 
+            private void deltaDistance(MotionEvent motionEvent) {
+                double deltaX = motionEvent.getX() - lastX;
+                double deltaY = motionEvent.getY() - lastY;
+                double distance = Math.sqrt((deltaX * deltaX) + (deltaY*deltaY));
+                distanceMoved += distance;
+            }
+
+            private void maybeClicked() {
+                if (distanceMoved < MAX_DISTANCE) {
+
+                    try {
+                        if (!CommuteStream.getTestingFlag()) {
+                            listener.onAdClicked();
+                            listener.onAdLeftApplication();
+                        } else {
+                            Log.v("CS_SDK", "TEST AD CLICKED!");
+                        }
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri
+                                .parse(url));
+                        context.startActivity(intent);
+                    } catch (Throwable t) {
+                        // Something went wrong, oh well.
+                    }
+                }
+            }
 
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+                Log.d("CS_SDK", motionEvent.toString());
+                Log.d("CS_SDK", "Touch listener distance from down " + distanceMoved);
 
                 switch (motionEvent.getAction()) {
 
                     case MotionEvent.ACTION_DOWN:
-                        if (fingerState == FINGER_RELEASED) fingerState = FINGER_TOUCHED;
-                        else fingerState = FINGER_UNDEFINED;
+                        if (fingerState == FINGER_RELEASED || fingerState == FINGER_UNDEFINED ) {
+                            fingerState = FINGER_TOUCHED;
+                            distanceMoved = 0.0;
+                            lastX = motionEvent.getX();
+                            lastY = motionEvent.getY();
+                        } else {
+                            fingerState = FINGER_UNDEFINED;
+                        }
                         break;
 
                     case MotionEvent.ACTION_UP:
-                        if (fingerState != FINGER_DRAGGING) {
+                        if(fingerState == FINGER_TOUCHED || fingerState == FINGER_DRAGGING) {
+                            deltaDistance(motionEvent);
                             fingerState = FINGER_RELEASED;
-                            try {
-                                if (!CommuteStream.getTestingFlag()) {
-                                    listener.onAdClicked();
-                                    listener.onAdLeftApplication();
-                                } else {
-                                    Log.v("CS_SDK", "TEST AD CLICKED!");
-                                }
-                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri
-                                        .parse(url));
-                                context.startActivity(intent);
-                            } catch (Throwable t) {
-                                // Something went wrong, oh well.
-                            }
-                        } else if (fingerState == FINGER_DRAGGING) fingerState = FINGER_RELEASED;
-                        else fingerState = FINGER_UNDEFINED;
+                            maybeClicked();
+                        } else {
+                            fingerState = FINGER_UNDEFINED;
+                        }
                         break;
 
                     case MotionEvent.ACTION_MOVE:
-                        if (fingerState == FINGER_TOUCHED || fingerState == FINGER_DRAGGING)
+                        if (fingerState == FINGER_TOUCHED || fingerState == FINGER_DRAGGING) {
                             fingerState = FINGER_DRAGGING;
+                            deltaDistance(motionEvent);
+                        }
                         else fingerState = FINGER_UNDEFINED;
                         break;
 
