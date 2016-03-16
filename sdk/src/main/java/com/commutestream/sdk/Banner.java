@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -73,7 +75,13 @@ public class Banner implements CustomEventBanner {
         });
     }
 
-
+    private DisplayMetrics displayMetrics(Context context) {
+        DisplayMetrics metrics = new DisplayMetrics();
+        WindowManager windowManager = (WindowManager) context
+                .getSystemService(Context.WINDOW_SERVICE);
+        windowManager.getDefaultDisplay().getMetrics(metrics);
+        return metrics;
+    }
 
     // does the actual update of the activity
     @SuppressLint("SetJavaScriptEnabled")
@@ -111,26 +119,41 @@ public class Banner implements CustomEventBanner {
         webView.setLayoutParams(new RelativeLayout.LayoutParams(size.getWidthInPixels(context),
                 size.getHeightInPixels(context)));
 
+
         // webView.getSettings().setLoadWithOverviewMode(true);
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setLoadWithOverviewMode(true);
+        final DisplayMetrics dispMetrics =displayMetrics(context);
+
         webView.setOnTouchListener(new OnTouchListener() {
             public final static int FINGER_RELEASED = 0;
             public final static int FINGER_TOUCHED = 1;
             public final static int FINGER_DRAGGING = 2;
             public final static int FINGER_UNDEFINED = 3;
-            public final static double MAX_DISTANCE = 20.0;
+            public final static double MAX_DISTANCE = 0.1;
 
             private int fingerState = FINGER_RELEASED;
             private double distanceMoved = 0.0;
             private double lastX = 0.0;
             private double lastY = 0.0;
 
+            private double getPhysicalX(MotionEvent motionEvent) {
+                return motionEvent.getX()/dispMetrics.xdpi;
+            }
+
+            private double getPhysicalY(MotionEvent motionEvent) {
+                return motionEvent.getY()/dispMetrics.ydpi;
+            }
+
             private void deltaDistance(MotionEvent motionEvent) {
-                double deltaX = motionEvent.getX() - lastX;
-                double deltaY = motionEvent.getY() - lastY;
+                double nextX = getPhysicalX(motionEvent);
+                double nextY = getPhysicalY(motionEvent);
+                double deltaX = nextX - lastX;
+                double deltaY = nextY - lastY;
                 double distance = Math.sqrt((deltaX * deltaX) + (deltaY*deltaY));
                 distanceMoved += distance;
+                lastX = nextX;
+                lastY = nextY;
             }
 
             private void maybeClicked() {
@@ -155,7 +178,8 @@ public class Banner implements CustomEventBanner {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 Log.d("CS_SDK", motionEvent.toString());
-                Log.d("CS_SDK", "Touch listener distance from down " + distanceMoved);
+                Log.d("CS_SDK", "Last Position (" + lastX + ", " + lastY + ")");
+                Log.d("CS_SDK", "Last Distance " + distanceMoved);
 
                 switch (motionEvent.getAction()) {
 
@@ -163,8 +187,8 @@ public class Banner implements CustomEventBanner {
                         if (fingerState == FINGER_RELEASED || fingerState == FINGER_UNDEFINED ) {
                             fingerState = FINGER_TOUCHED;
                             distanceMoved = 0.0;
-                            lastX = motionEvent.getX();
-                            lastY = motionEvent.getY();
+                            lastX = getPhysicalX(motionEvent);
+                            lastY = getPhysicalY(motionEvent);
                         } else {
                             fingerState = FINGER_UNDEFINED;
                         }
@@ -192,7 +216,10 @@ public class Banner implements CustomEventBanner {
                         fingerState = FINGER_UNDEFINED;
                 }
 
-                return false;
+                Log.d("CS_SDK", "Next Position (" + lastX + ", " + lastY + ")");
+                Log.d("CS_SDK", "Next distance " + distanceMoved);
+
+                return true;
             }
 
         });
