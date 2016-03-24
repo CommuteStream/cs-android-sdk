@@ -20,7 +20,7 @@ class AdRequestQueryMap {
         }
         params.put("app_name", request.getAppName());
         params.put("app_ver", request.getAppVersion());
-        params.put("sdk_name", request.getSdkName());
+        maybe_put(params, "sdk_name", request.getSdkName());
         params.put("sdk_ver", request.getSdkVersion());
         params.put("aid_sha", request.getAidSha());
         params.put("aid_md5", request.getAidMd5());
@@ -40,5 +40,11 @@ class AdRequestQueryMap {
             params.put("agency_interest", AgencyInterestCSVEncoder.Encode(request.getAgencyInterests()));
         }
         return params;
+    }
+
+    static void maybe_put(Map<String, String> params, String key, String value) {
+        if(value != null) {
+            params.put(key, value);
+        }
     }
 }

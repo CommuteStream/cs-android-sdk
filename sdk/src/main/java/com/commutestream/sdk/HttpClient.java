@@ -29,8 +29,8 @@ class HttpClient implements Client {
     }
 
     private void init() {
-        okClient = new OkHttpClient();
-        okClient.interceptors().add(new HttpLogger());
+
+        okClient = new OkHttpClient.Builder().addInterceptor(new HttpLogger()).build();
         retrofit = new Retrofit.Builder()
                 .client(okClient)
                 .baseUrl(baseURL)
