@@ -2,9 +2,9 @@ package com.commutestream.sdk;
 
 import java.util.Map;
 
-import retrofit.Call;
-import retrofit.http.GET;
-import retrofit.http.QueryMap;
+import retrofit2.Call;
+import retrofit2.http.GET;
+import retrofit2.http.QueryMap;
 
 /**
  * RetrofitClient implements Client using Retrofit

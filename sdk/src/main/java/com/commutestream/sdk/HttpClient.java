@@ -2,14 +2,13 @@ package com.commutestream.sdk;
 
 import android.util.Log;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.ResponseBody;
 
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.GsonConverterFactory;
-import retrofit.Response;
-import retrofit.Retrofit;
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Http Client for CommuteStream Ads
@@ -46,7 +45,7 @@ class HttpClient implements Client {
 
         Callback<AdResponse> callback = new Callback<AdResponse>() {
             @Override
-            public void onResponse(Response<AdResponse> response) {
+            public void onResponse(Call<AdResponse> call, Response<AdResponse> response) {
                 long end_time = System.nanoTime();
                 double difference = (end_time - start_time)/1e6;
                 if(response.body() != null) {
@@ -64,7 +63,7 @@ class HttpClient implements Client {
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(Call<AdResponse> call, Throwable t) {
                 Log.v("CS_SDK", "Ad request error " + t.toString());
                 adHandler.onError(t);
             }

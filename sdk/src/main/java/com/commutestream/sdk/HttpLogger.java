@@ -2,17 +2,18 @@ package com.commutestream.sdk;
 
 import android.util.Log;
 
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 
 import java.io.IOException;
+
+import okhttp3.Interceptor;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * OkHttp Interceptor for logging HTTP Request/Responses
  */
 public class HttpLogger implements Interceptor {
-    @Override public Response intercept(Chain chain) throws IOException {
+    @Override public Response intercept(Interceptor.Chain chain) throws IOException {
         Request request = chain.request();
 
         long t1 = System.nanoTime();
