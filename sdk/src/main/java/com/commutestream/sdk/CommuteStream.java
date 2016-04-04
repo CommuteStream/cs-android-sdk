@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class CommuteStream {
     private static int requestsBeforeInit = 0;
-    private static final String version = "0.7.1";
+    private static final String version = BuildConfig.VERSION_NAME;
     private static final int TWO_MINUTES = 1000 * 60 * 2;
     private static boolean initialized = false;
     private static HttpClient httpClient;
@@ -47,6 +47,7 @@ public class CommuteStream {
         CommuteStream.setAppName(ContextUtils.getAppName(context));
         CommuteStream.setAppVersion(ContextUtils.getAppVersion(context));
         CommuteStream.setAid(ContextUtils.getAndroidID(context));
+        CommuteStream.lookupAAID(context);
         CommuteStream.setAdUnitUuid(adUnit);
         if (!isInitialized()) {
             CommuteStream.setInitialized(true);
@@ -170,6 +171,35 @@ public class CommuteStream {
     public static synchronized void setTheme(String theme) {
         CommuteStream.request.setTheme(theme);
     }
+
+    /**
+     * Get the AAID from an Android Context and assign it to our singleton. This can only
+     * happen on another thread so we simply spawn one up. This might fail for a wide variety
+     * of reasons.
+     */
+    public static void lookupAAID(final Context context) {
+        Thread aaidRunner = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                CommuteStream.setAAID(ContextUtils.getAAID(context));
+            }
+        });
+        aaidRunner.start();
+    }
+
+    /**
+     * Set the AAID
+     *
+     * @param aaid
+     */
+    public static synchronized void setAAID(String aaid) { CommuteStream.request.setAAID(aaid); }
+
+    /**
+     * Get the assigned android advertising ID
+     *
+     * @return aaid Android Advertising ID
+     */
+    public static synchronized String getAAID() { return CommuteStream.request.getAAID(); }
 
     /**
      * Set the android device ID

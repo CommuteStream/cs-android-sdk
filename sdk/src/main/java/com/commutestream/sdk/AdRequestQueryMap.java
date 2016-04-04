@@ -24,6 +24,9 @@ class AdRequestQueryMap {
         params.put("sdk_ver", request.getSdkVersion());
         params.put("aid_sha", request.getAidSha());
         params.put("aid_md5", request.getAidMd5());
+        if(request.getAAID() != null) {
+            params.put("aaid", request.getAAID());
+        }
         params.put("banner_height", Integer.toString(request.getBannerHeight()));
         params.put("banner_width", Integer.toString(request.getBannerWidth()));
         params.put("ad_unit_uuid", request.getAdUnitUuid());

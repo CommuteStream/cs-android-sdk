@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="appName">CommuteStream SDK</string>
-    <string name="app_versionName">0.4.0</string>
-
     <string name="ad_service_started">Started</string>
     <string name="ad_service_stopped">Stopped</string>
     <string name="ad_service_label">CommuteStream Service</string>
