@@ -36,12 +36,17 @@ public class ContextUtils {
                 Settings.Secure.ANDROID_ID);
     }
 
+    /**
+     * Attempt to get the Android Advertising ID, returns null and logs on failure
+     * @param context
+     * @return aaid
+     */
     static String getAAID(Context context) {
         try {
             return AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
         } catch (Exception e) {
             Log.e("CS_SDK", "Failed to get Android Advertising ID", e);
-            return "";
+            return null;
         }
     }
 }
