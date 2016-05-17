@@ -1,3 +1,6 @@
+# 0.7.2
+* Send AAID along with hashed versions of AID. AID will be removed from future versions.
+
 # 0.7.1
 * Resolve some errors caused by API changes in Retrofit and OkHttp
 
