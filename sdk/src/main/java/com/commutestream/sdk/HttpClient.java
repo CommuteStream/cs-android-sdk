@@ -48,16 +48,16 @@ class HttpClient implements Client {
             public void onResponse(Call<AdResponse> call, Response<AdResponse> response) {
                 long end_time = System.nanoTime();
                 double difference = (end_time - start_time)/1e6;
-                if(response.body() != null) {
+                if(response.isSuccessful() && response.body() != null) {
                     if(CommuteStream.getTestingFlag() && response.body().getBannerRequestUuid() == null) {
                         Log.e("CS_SDK", "Response deserialization appears to have failed, possibly a Proguard Configuration problem!\n" +
                                 "See documentation at https://commutestream.com/sdkinstructions regarding Proguard rules");
                     } else {
-                        Log.v("CS_SDK", "Ad request successful: " + response.body().toString());
+                        Log.v("CS_SDK", "Ad request succeeded in " + difference + "ms, response: " + response.raw());
                     }
                     adHandler.onSuccess(response.body(), difference);
                 } else {
-                    Log.v("CS_SDK", "Ad request null response, HTTP Code: " + response.code() + " , Raw Body: " + response.raw());
+                    Log.v("CS_SDK", "Ad request failed in " + difference + "ms, response, " + response.raw());
                     adHandler.onError(new Exception("Empty or Incorrect HTTP Response"));
                 }
             }
