@@ -1,17 +1,18 @@
 apply plugin: 'com.android.library'
 
+
 ext {
 	PUBLISH_GROUP_ID = 'com.commutestream.sdk'
 	PUBLISH_ARTIFACT_ID = 'commutestream-sdk'
-	PUBLISH_VERSION = '0.7.4'
+	PUBLISH_VERSION = '0.8.0'
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.1"
     defaultConfig {
         minSdkVersion 10
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
         versionName PUBLISH_VERSION
         testApplicationId "com.commutestream.sdk.test"
@@ -26,7 +27,7 @@ android {
 }
 
 dependencies {
-    compile 'com.google.android.gms:play-services-ads:8.4.0'
+    compile 'com.google.android.gms:play-services-ads:9.4.0'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'com.squareup.retrofit2:retrofit:2.0.0'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0'
@@ -36,3 +37,4 @@ dependencies {
 }
 
 apply from :'android-release-aar.gradle'
+apply plugin: 'com.google.gms.google-services'
