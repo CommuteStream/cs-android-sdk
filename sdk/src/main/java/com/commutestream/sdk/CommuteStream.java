@@ -11,6 +11,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.HttpUrl;
+
 /**
  * This application extension is where we store things that
  * should persist for the life of the application. i.e. The
@@ -60,7 +62,8 @@ public class CommuteStream {
      * @param baseURL HTTP client base URL
      */
     public synchronized static void setBaseURL(String baseURL) {
-        httpClient = new HttpClient(baseURL);
+        HttpUrl url = HttpUrl.parse(baseURL);
+        httpClient = new HttpClient(url);
     }
 
     /**
@@ -69,7 +72,7 @@ public class CommuteStream {
      * @return base URL for HTTP client
      */
     public synchronized static String getBaseURL() {
-        return getHttpClient().getBaseURL();
+        return getHttpClient().getBaseURL().toString();
     }
 
     /**

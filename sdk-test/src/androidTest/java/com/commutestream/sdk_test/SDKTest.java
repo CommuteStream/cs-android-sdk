@@ -46,7 +46,7 @@ public class SDKTest {
 
     @Test
     public void setBaseURL() {
-        String baseURL = "http://localhost:9000";
+        String baseURL = "http://localhost:9000/";
         CommuteStream.setBaseURL(baseURL);
         assertThat(CommuteStream.getBaseURL()).isEqualTo(baseURL);
     }
