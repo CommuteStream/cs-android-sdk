@@ -10,6 +10,7 @@ public class AdResponse {
     private String error;
     private String html;
     private String url;
+    private boolean interactive;
 
     public String getBannerRequestUuid() {
         return banner_request_uuid;

@@ -1,10 +1,9 @@
 package com.commutestream.sdk;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-import android.webkit.WebView;
+import android.view.View;
 
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdRequest;
@@ -21,7 +20,7 @@ import com.google.android.gms.ads.mediation.customevent.CustomEventBannerListene
  */
 public class AdMobBannerAdapter implements CustomEventBanner {
 
-    private WebView adView;
+    private View adView;
 
     @Override
     public void requestBannerAd(final Context context, final CustomEventBannerListener listener,
@@ -41,10 +40,10 @@ public class AdMobBannerAdapter implements CustomEventBanner {
                 // on to admob
                 if (response.getHtml() != null) {
                     Log.v("CS_SDK", "BANNER REQUEST SUCCEESS, TOOK: " + requestTime + "ms");
-                    adView = generateWebView(listener, context,
-                            size,
-                            response.getHtml(),
-                            requestTime);
+                    AdMobEventForwarder forwarder = new AdMobEventForwarder(listener);
+                    adView = StaticAdViewFactory.create(context, forwarder, response.getHtml(),
+                            response.getUrl(), requestTime, size.getWidthInPixels(context),
+                            size.getHeightInPixels(context));
                     listener.onAdLoaded(adView);
                 } else if (response.getError() != null) {
                     Log.v("CS_SDK", "Response had an error " + response.getError());
@@ -61,18 +60,6 @@ public class AdMobBannerAdapter implements CustomEventBanner {
                 listener.onAdFailedToLoad(AdRequest.ERROR_CODE_NETWORK_ERROR);
             }
         });
-    }
-
-    // does the actual update of the activity
-    @SuppressLint("SetJavaScriptEnabled")
-    private WebView generateWebView(final CustomEventBannerListener listener,
-                                    final Context context,
-                                    final AdSize size,
-                                    final String html,
-                                    final double requestTime) {
-        Log.v("CS_SDK", "Generating Ad WebView");
-        AdMobEventForwarder forwarder = new AdMobEventForwarder(listener);
-        return new BannerView(context, requestTime, size.getWidthInPixels(context), size.getHeightInPixels(context), forwarder, html);
     }
 
     @Override

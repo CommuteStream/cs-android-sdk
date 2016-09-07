@@ -17,7 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 class HttpClient implements Client {
     final Logger logger = LoggerFactory.getLogger(HttpLogger.class);
 
-    private HttpUrl baseURL = new HttpUrl.Builder().scheme("https").host("api.commutestream.com").port(3000).build();
+    private HttpUrl baseURL = new HttpUrl.Builder().scheme("http").host("10.11.12.159").port(3000).build();
     private OkHttpClient okClient;
     private Retrofit retrofit;
     private RetrofitClient client;
