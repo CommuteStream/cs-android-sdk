@@ -1,1 +1,1 @@
-include ':sdk', ':sdk-test'
+include ':sdk', ':sdk-test', ':showcase'
