@@ -9,8 +9,12 @@ import android.widget.FrameLayout;
 
 import com.commutestream.sdk.AdEventListener;
 import com.commutestream.sdk.StaticAdViewFactory;
+import com.commutestream.sdk.VisibilityListener;
+import com.commutestream.sdk.VisibilityMonitor;
 
 public class BannerActivity extends AppCompatActivity  {
+
+    private VisibilityMonitor mVisibilityMonitor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +29,17 @@ public class BannerActivity extends AppCompatActivity  {
         String html = "<html><body><h1>Banner Ad</h1></body></html>";
         String redirectUrl = "https://commutestream.com";
         View bannerView = StaticAdViewFactory.create(getApplicationContext(), listener, html, redirectUrl, 0.0, 320, 50);
+        mVisibilityMonitor = new VisibilityMonitor(new VisibilityListener() {
+            @Override
+            public void onVisible(View view) {
+                Log.v("CS_SHOWCASE", "Banner Visible");
+            }
+
+            @Override
+            public void onHidden(View view) {
+                Log.v("CS_SHOWCASE", "Banner Hidden");
+            }
+        }, bannerView);
         FrameLayout bannerFrame = (FrameLayout) findViewById(R.id.bannerAdFrame);
         bannerFrame.addView(bannerView);
     }
