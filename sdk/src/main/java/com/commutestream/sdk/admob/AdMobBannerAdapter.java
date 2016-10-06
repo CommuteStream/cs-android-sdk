@@ -1,10 +1,15 @@
-package com.commutestream.sdk;
+package com.commutestream.sdk.admob;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import com.commutestream.sdk.AdHandler;
+import com.commutestream.sdk.AdResponse;
+import com.commutestream.sdk.AdResponseHandler;
+import com.commutestream.sdk.CommuteStream;
+import com.commutestream.sdk.StaticAdViewFactory;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.mediation.MediationAdRequest;
@@ -32,26 +37,11 @@ public class AdMobBannerAdapter implements CustomEventBanner {
         }
         CommuteStream.setBannerHeight(size.getHeightInPixels(context));
         CommuteStream.setBannerWidth(size.getWidthInPixels(context));
-        CommuteStream.requestAd(new AdResponseHandler() {
+        CommuteStream.getAd(new AdHandler(View view) {
+
             @Override
             public void onSuccess(AdResponse response, double requestTime) {
-                // if there is something that the server wants us to
-                // display we generate a webview for it and pass it
-                // on to admob
-                if (response.getHtml() != null) {
-                    Log.v("CS_SDK", "BANNER REQUEST SUCCEESS, TOOK: " + requestTime + "ms");
-                    AdMobEventForwarder forwarder = new AdMobEventForwarder(listener);
-                    adView = StaticAdViewFactory.create(context, forwarder, response.getHtml(),
-                            response.getUrl(), requestTime, size.getWidthInPixels(context),
-                            size.getHeightInPixels(context));
-                    listener.onAdLoaded(adView);
-                } else if (response.getError() != null) {
-                    Log.v("CS_SDK", "Response had an error " + response.getError());
-                    listener.onAdFailedToLoad(AdRequest.ERROR_CODE_INVALID_REQUEST);
-                } else {
-                    Log.v("CS_SDK", "Response had no error or html");
-                    listener.onAdFailedToLoad(AdRequest.ERROR_CODE_NO_FILL);
-                }
+
             }
 
             @Override

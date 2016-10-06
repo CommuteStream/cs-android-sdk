@@ -1,5 +1,6 @@
-package com.commutestream.sdk;
+package com.commutestream.sdk.admob;
 
+import com.commutestream.sdk.AdEventListener;
 import com.google.android.gms.ads.mediation.customevent.CustomEventListener;
 
 /**
@@ -13,6 +14,8 @@ public class AdMobEventForwarder implements AdEventListener {
     public AdMobEventForwarder(CustomEventListener listener) {
         this.listener = listener;
     }
+
+    public void onImpressed() { this.listener.onAdOpened(); }
 
     public void onClicked() {
         this.listener.onAdClicked();

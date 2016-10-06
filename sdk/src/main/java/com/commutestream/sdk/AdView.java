@@ -1,7 +1,6 @@
 package com.commutestream.sdk;
 
 import android.content.Context;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -14,21 +13,13 @@ public class AdView extends FrameLayout implements VisibilityListener, Interacti
     View mContentView;
     VisibilityMonitor mVisibilityMonitor;
     InteractionMonitor mInteractionMonitor;
+    AdEventListener mAdEventListener;
+    boolean mImpressed = false;
+    boolean mClicked = false;
 
-    public AdView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init();
-
-    }
-
-    public AdView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-
-    public AdView(Context context) {
+    public AdView(Context context, AdEventListener adEventListener) {
         super(context);
-        init();
+        init(adEventListener);
     }
 
     public void setContentView(View view) {
@@ -41,25 +32,41 @@ public class AdView extends FrameLayout implements VisibilityListener, Interacti
         addView(mContentView);
     }
 
-    private void init() {
+    private void init(AdEventListener adEventListener) {
+        mAdEventListener = adEventListener;
         mVisibilityMonitor = new VisibilityMonitor(this, this);
         mInteractionMonitor = new InteractionMonitor(this, this);
     }
 
     @Override
     public void onVisible(View view) {
-        Log.v("CS_SDK", "AdView Impression");
-
+        impressed();
     }
 
     @Override
     public void onHidden(View view) {
-
     }
 
     @Override
     public void onTap(View view) {
-        Log.v("CS_SDK", "AdView Click");
+        clicked();
+    }
 
+    private void impressed() {
+        if(mImpressed) {
+            return;
+        }
+        Log.v("CS_SDK", "Ad Impressed");
+        mImpressed = true;
+        mAdEventListener.onImpressed();
+    }
+
+    private void clicked() {
+        if(mClicked || !mImpressed) {
+            return;
+        }
+        Log.v("CS_SDK", "Ad Clicked");
+        mClicked = true;
+        mAdEventListener.onClicked();
     }
 }

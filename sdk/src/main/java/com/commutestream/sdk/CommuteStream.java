@@ -471,6 +471,16 @@ public class CommuteStream {
     }
 
     /**
+     * Get an Ad for display
+     *
+     * @param handler response handler
+     */
+    public static synchronized void getAd(AdHandler handler, AdEventListener listener) {
+        getClient().getAd(nextRequest(true), new AdFactoryResponseHandler(handler, listener));
+
+    }
+
+    /**
      * Request an ad
      * @param handler response handler
      */
