@@ -34,7 +34,7 @@ public class VisibilityMonitor implements ViewTreeObserver.OnGlobalLayoutListene
         Point viewOffsetPoint = new Point();
         mView.getRootView().getGlobalVisibleRect(globalVisibleRect);
         mView.getGlobalVisibleRect(viewVisibleRect, viewOffsetPoint);
-        Log.d("CS_SDK", "Global Hit Rect: " + globalVisibleRect.toString() + " View Visible Rect: " + viewVisibleRect.toString() + " View Offset Point: " + viewOffsetPoint + " Visibility: " + mView.getVisibility());
+        //Log.d("CS_SDK", "Global Hit Rect: " + globalVisibleRect.toString() + " View Visible Rect: " + viewVisibleRect.toString() + " View Offset Point: " + viewOffsetPoint + " Visibility: " + mView.getVisibility());
         return mView.getVisibility() == View.VISIBLE && Rect.intersects(globalVisibleRect, viewVisibleRect);
     }
 
