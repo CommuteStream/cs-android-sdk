@@ -1,10 +1,10 @@
 package com.commutestream.sdk;
 
 /**
- * AdResponseHandler is used by the Client to handle AdRequest Responses.
+ * AdResponseHandler is the required interface for classes wishing to handle
+ * responses to Ad Requests.
  */
 interface AdResponseHandler {
-    void onSuccess(AdResponse response, double requestTime);
-
+    void onSuccess(AdMetadata metadata, byte[] content);
     void onError(Throwable error);
 }

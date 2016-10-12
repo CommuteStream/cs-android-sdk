@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import android.util.Base64;
 import android.util.Log;
+import android.view.View;
 
 import java.security.MessageDigest;
 import java.util.concurrent.ScheduledExecutorService;
@@ -475,9 +476,23 @@ public class CommuteStream {
      *
      * @param handler response handler
      */
-    public static synchronized void getAd(AdHandler handler, AdEventListener listener) {
-        getClient().getAd(nextRequest(true), new AdFactoryResponseHandler(handler, listener));
+    public static synchronized void getAd(final Context context, final AdHandler handler, final AdEventListener listener) {
+        getClient().getAd(nextRequest(true), new AdResponseHandler() {
+            @Override
+            public void onSuccess(AdMetadata metadata, byte[] content) {
+                try {
+                    View view = AdViewFactory.build(context, listener, metadata, content);
+                    handler.onAd(metadata, view);
+                } catch (Throwable error) {
+                    handler.onError(error);
+                }
+            }
 
+            @Override
+            public void onError(Throwable error) {
+                handler.onError(error);
+            }
+        });
     }
 
     /**
@@ -490,12 +505,12 @@ public class CommuteStream {
 
     /**
      * Request update
-     * @param handler response handler
+     * @param handler update response handler
      */
-    static void requestUpdate(AdResponseHandler handler) {
-        AdRequest request = nextRequest(false);
-        request.setSkipFetch(true);
-        getClient().getAd(request, handler);
+    static void requestUpdate(UpdateResponseHandler handler) {
+        //AdRequest request = nextRequest(false);
+        //request.setSkipFetch(true);
+        //getClient().getAd(request, handler);
     }
 
     /**

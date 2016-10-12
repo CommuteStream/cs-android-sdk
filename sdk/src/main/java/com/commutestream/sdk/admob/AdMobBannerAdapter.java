@@ -6,10 +6,8 @@ import android.util.Log;
 import android.view.View;
 
 import com.commutestream.sdk.AdHandler;
-import com.commutestream.sdk.AdResponse;
-import com.commutestream.sdk.AdResponseHandler;
+import com.commutestream.sdk.AdMetadata;
 import com.commutestream.sdk.CommuteStream;
-import com.commutestream.sdk.StaticAdViewFactory;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.mediation.MediationAdRequest;
@@ -35,13 +33,14 @@ public class AdMobBannerAdapter implements CustomEventBanner {
         if(!CommuteStream.isInitialized()) {
             CommuteStream.init(context, serverParameter);
         }
+        AdMobEventForwarder adMobEventForwarder = new AdMobEventForwarder(listener);
         CommuteStream.setBannerHeight(size.getHeightInPixels(context));
         CommuteStream.setBannerWidth(size.getWidthInPixels(context));
-        CommuteStream.getAd(new AdHandler(View view) {
+        CommuteStream.getAd(context, new AdHandler() {
 
             @Override
-            public void onSuccess(AdResponse response, double requestTime) {
-
+            public void onAd(AdMetadata metadata, View view) {
+                listener.onAdLoaded(view);
             }
 
             @Override
@@ -49,7 +48,7 @@ public class AdMobBannerAdapter implements CustomEventBanner {
                 Log.v("CS_SDK", "FAILED_FETCH");
                 listener.onAdFailedToLoad(AdRequest.ERROR_CODE_NETWORK_ERROR);
             }
-        });
+        }, adMobEventForwarder);
     }
 
     @Override

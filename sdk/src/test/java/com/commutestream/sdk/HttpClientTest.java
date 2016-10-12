@@ -25,11 +25,10 @@ public class HttpClientTest {
         AdRequest req = new AdRequest();
         AdResponseHandler handler = new AdResponseHandler() {
             @Override
-            public void onSuccess(AdResponse response, double requestTime) {
-                assertThat(response.isItemReturned()).isTrue();
-                assertThat(response.getHtml()).isNotEmpty();
-                assertThat(response.getUrl()).isNotEmpty();
-                assertThat(requestTime).isGreaterThan(0.0);
+            public void onSuccess(AdMetadata metadata, byte[] content) {
+                assertThat(content).isNotEmpty();
+                assertThat(metadata.clickUrl).isNotEmpty();
+                assertThat(metadata.requestTime).isGreaterThan(0.0);
                 synchronized (this) {
                     notifyAll();
                 }
@@ -61,9 +60,8 @@ public class HttpClientTest {
         AdRequest req = new AdRequest();
         AdResponseHandler handler = new AdResponseHandler() {
             @Override
-            public void onSuccess(AdResponse response, double requestTime) {
-                assertThat(response.isItemReturned()).isFalse();
-                assertThat(requestTime).isGreaterThan(0.0);
+            public void onSuccess(AdMetadata metadata, byte[] content) {
+                assertThat(metadata.requestTime).isGreaterThan(0.0);
                 synchronized (this) {
                     notifyAll();
                 }
@@ -93,7 +91,7 @@ public class HttpClientTest {
         AdRequest req = new AdRequest();
         AdResponseHandler handler = new AdResponseHandler() {
             @Override
-            public void onSuccess(AdResponse response, double requestTime) {
+            public void onSuccess(AdMetadata metadata, byte[] content) {
                 fail("Expected failure response");
                 synchronized (this) {
                     notifyAll();

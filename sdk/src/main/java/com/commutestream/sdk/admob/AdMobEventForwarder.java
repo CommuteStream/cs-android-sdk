@@ -6,7 +6,7 @@ import com.google.android.gms.ads.mediation.customevent.CustomEventListener;
 /**
  * Forward Ad events to an AdMob CustomeEventListener
  * @see com.commutestream.sdk.AdEventListener
- * @see com.google.android.gms.ads.mediation.customevent.CustomEventListener
+ * @see com.google.android.gms.ads.mediation.customevent.CustomEventBannerListener
  */
 public class AdMobEventForwarder implements AdEventListener {
     private CustomEventListener listener;

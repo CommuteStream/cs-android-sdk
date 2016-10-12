@@ -40,6 +40,7 @@ public class InteractionMonitor implements View.OnTouchListener, GestureDetector
     @Override
     public boolean onSingleTapUp(MotionEvent e) {
         Log.v("CS_SDK", "Tap");
+        mListener.onTap(mView);
         return false;
     }
 

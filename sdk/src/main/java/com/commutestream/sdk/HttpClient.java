@@ -1,78 +1,115 @@
 package com.commutestream.sdk;
 
+
+import android.icu.util.TimeZone;
+import android.support.annotation.NonNull;
+import android.util.Log;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+import java.nio.ShortBuffer;
+import java.util.UUID;
+
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * Http Client for CommuteStream Ads
  */
 class HttpClient implements Client {
+    public final static Exception HttpFailure = new Exception("HTTP response was not OK");
+
+    private static String BANNER_REQUEST_UUID_HEADER = "X-CS-BANNER-REQUEST-UUID";
+    private static String REQUEST_ID_HEADER = "X-CS-REQUEST-ID";
+    private static String IMPRESSION_URL_HEADER = "X-CS-IMPRESSION-URL";
+    private static String CLICK_URL_HEADER = "X-CS-CLICK-URL";
+
     final Logger logger = LoggerFactory.getLogger(HttpLogger.class);
 
-    private HttpUrl baseURL = new HttpUrl.Builder().scheme("http").host("10.11.12.159").port(3000).build();
-    private OkHttpClient okClient;
-    private Retrofit retrofit;
-    private RetrofitClient client;
+    private HttpUrl mBaseURL = new HttpUrl.Builder().scheme("https").host("api.commutestream.com").build();
+    private OkHttpClient mClient;
 
     HttpClient() {
         init();
     }
 
     HttpClient(HttpUrl baseURL) {
-        this.baseURL = baseURL;
+        mBaseURL = baseURL;
         init();
     }
 
     private void init() {
-
-        okClient = new OkHttpClient.Builder().addInterceptor(new HttpLogger()).build();
-        retrofit = new Retrofit.Builder()
-                .client(okClient)
-                .baseUrl(baseURL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        client = retrofit.create(RetrofitClient.class);
+        mClient = new OkHttpClient.Builder().addInterceptor(new HttpLogger()).build();
     }
 
     @Override
-    public void getAd(AdRequest request, final AdResponseHandler adHandler) {
-        final long start_time = System.nanoTime();
+    public void postUpdates(UpdateRequest updates, final UpdateResponseHandler updateHandler) {
+        final long startTime = System.nanoTime();
 
-        Callback<AdResponse> callback = new Callback<AdResponse>() {
+    }
+
+    @Override
+    public void getAd(AdRequest adRequest, final AdResponseHandler adHandler) {
+        final long startTime = System.nanoTime();
+        //Moshi moshi = new Moshi.Builder().build();
+        //JsonAdapter<AdRequest> jsonAdapter = moshi.adapter(AdRequest.class);
+        //String json = jsonAdapter.toJson(adRequest);
+        TimeZone tz = TimeZone.getDefault();
+        logger.debug("Current timezone is " + tz.getDisplayName());
+        String json = "{}";
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        RequestBody body = RequestBody.create(JSON, json);
+        HttpUrl url = mBaseURL.newBuilder("/v2/banner").build();
+        Request request = new Request.Builder()
+                .url(url)
+                //.addHeader("Accepts", AdContentTypes.acceptsHeader())
+                .post(body)
+                .build();
+        Callback callback = new Callback() {
             @Override
-            public void onResponse(Call<AdResponse> call, Response<AdResponse> response) {
-                long end_time = System.nanoTime();
-                double difference = (end_time - start_time)/1e6;
-                if(response.isSuccessful() && response.body() != null) {
-                    if(CommuteStream.getTestingFlag() && response.body().getBannerRequestUuid() == null) {
-                        logger.error("CS_SDK", "Response deserialization appears to have failed, possibly a Proguard Configuration problem!\n" +
-                                "See documentation at https://commutestream.com/sdkinstructions regarding Proguard rules");
-                    } else {
-                        logger.trace("CS_SDK", "Ad request succeeded in " + difference + "ms, response: " + response.raw());
-                    }
-                    adHandler.onSuccess(response.body(), difference);
-                } else {
-                    logger.trace("CS_SDK", "Ad request failed in " + difference + "ms, response, " + response.raw());
-                    adHandler.onError(new Exception("Empty or Incorrect HTTP Response"));
+            public void onFailure(Call call, IOException e) {
+                adHandler.onError(e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) {
+                if (!response.isSuccessful()) {
+                    adHandler.onError(HttpFailure);
+                    return;
+                }
+                try {
+                    final long endTime = System.nanoTime();
+                    ResponseBody body = response.body();
+                    AdMetadata metadata = new AdMetadata();
+                    metadata.requestID = Integer.getInteger(response.header(HttpClient.REQUEST_ID_HEADER));
+                    metadata.contentType = body.contentType().type() + "/" + body.contentType().subtype();
+                    metadata.impressionUrl = response.header(HttpClient.IMPRESSION_URL_HEADER);
+                    metadata.clickUrl = response.header(HttpClient.CLICK_URL_HEADER);
+                    metadata.requestTime = endTime - startTime;
+                    metadata.validate();
+                    adHandler.onSuccess(metadata, response.body().bytes());
+                } catch (Throwable t) {
+                    adHandler.onError(t);
                 }
             }
-
-            @Override
-            public void onFailure(Call<AdResponse> call, Throwable t) {
-                logger.trace("CS_SDK", "Ad request error " + t.toString());
-                adHandler.onError(t);
-            }
         };
-        Call<AdResponse> call = client.getBanner(AdRequestQueryMap.Map(request));
-        call.enqueue(callback);
+        mClient.newCall(request).enqueue(callback);
     }
 
     /**
@@ -80,5 +117,5 @@ class HttpClient implements Client {
      *
      * @return
      */
-    public HttpUrl getBaseURL() { return baseURL; }
+    public HttpUrl getBaseURL() { return mBaseURL; }
 }

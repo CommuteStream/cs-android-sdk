@@ -11,16 +11,7 @@ public class Updater extends TimerTask {
     @Override
     public void run() {
         Log.v("CS_SDK", "Sending client updates");
-        CommuteStream.requestUpdate(new AdResponseHandler() {
-            @Override
-            public void onSuccess(AdResponse response, double requestTime) {
-                if(response.getError() != null) {
-                    Log.v("CS_SDK", "Update response error message: " + response.getError());
-                } else {
-                    Log.v("CS_SDK", "Update succeeded in " + requestTime + "ms");
-                }
-            }
-
+        CommuteStream.requestUpdate(new UpdateResponseHandler() {
             @Override
             public void onError(Throwable t) {
                 Log.v("CS_SDK", "Update failed, reason: " + t.toString());
