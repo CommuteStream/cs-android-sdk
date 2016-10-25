@@ -1,24 +1,27 @@
 package com.commutestream.sdk;
 
+import android.app.IntentService;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 
-public class StaticAdViewFactory {
+import java.nio.charset.StandardCharsets;
+
+public class HtmlAdViewFactory {
     public static View create(final Context context, final AdEventListener listener,
                               final AdMetadata metadata, final byte[] content) {
 
-        String html = content.toString();
-
-        // Set the JS var for the request time, since its done in Java
-        final String html2 = html.replace("var loadTimeBanner = null;", "var loadTimeBanner = " + Math.round(metadata.requestTime) + ";");
+        String html = new String(content);
 
         // create a new webview and put the ad in it
-        WebView webView = new WebView(context);
+        final WebView webView = new WebView(context);
 
         // This block allows JS console messages to be transported to LogCat
         webView.setWebChromeClient(new WebChromeClient() {
@@ -32,15 +35,30 @@ public class StaticAdViewFactory {
         webView.setVerticalScrollBarEnabled(false);
         webView.setHorizontalScrollBarEnabled(false);
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadData(html2, "text/html", null);
+        webView.loadData(html, "text/html", null);
 
         webView.setLayoutParams(new RelativeLayout.LayoutParams(metadata.width,
                 metadata.height));
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setLoadWithOverviewMode(true);
 
-        AdView adView = new AdView(context, listener);
+
+        final AdView adView = new AdView(context, listener);
         adView.setContentView(webView);
+        webView.setWebViewClient(new WebClient(new UrlHandler() {
+            @Override
+            public boolean handleUrl(WebViewClient client, WebView view, String url) {
+                if(adView.wasClicked()) {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(url));
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(i);
+                } else {
+                    Log.e("CS_SDK", "not loading a url since the ad has not seen any interaction or visibility yet");
+                }
+                return true;
+            }
+        }));
         return adView;
     }
 }

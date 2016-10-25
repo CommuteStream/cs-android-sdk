@@ -11,7 +11,7 @@ import android.widget.FrameLayout;
 import com.commutestream.sdk.AdContentTypes;
 import com.commutestream.sdk.AdEventListener;
 import com.commutestream.sdk.AdMetadata;
-import com.commutestream.sdk.StaticAdViewFactory;
+import com.commutestream.sdk.HtmlAdViewFactory;
 import com.commutestream.sdk.VisibilityListener;
 import com.commutestream.sdk.VisibilityMonitor;
 
@@ -46,7 +46,8 @@ public class BannerActivity extends AppCompatActivity  {
             metadata.requestID = 1;
             metadata.clickUrl = "https://commutestream.com";
             metadata.impressionUrl = "https://commutestream.com";
-            View bannerView = StaticAdViewFactory.create(getApplicationContext(), listener, metadata, html);
+            byte[] html2 = "<a href=\"https://commutestream.com\"><h1>CommuteStream</h1></a>".getBytes();
+            View bannerView = HtmlAdViewFactory.create(getApplicationContext(), listener, metadata, html2);
             mVisibilityMonitor = new VisibilityMonitor(new VisibilityListener() {
                 @Override
                 public void onVisible(View view) {

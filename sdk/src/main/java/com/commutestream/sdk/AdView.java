@@ -38,6 +38,14 @@ public class AdView extends FrameLayout implements VisibilityListener, Interacti
         mInteractionMonitor = new InteractionMonitor(this, this);
     }
 
+    public boolean wasImpressed() {
+        return mImpressed;
+    }
+
+    public boolean wasClicked() {
+        return mClicked;
+    }
+
     @Override
     public void onVisible(View view) {
         impressed();

@@ -11,7 +11,7 @@ public class AdViewFactory {
     static public View build(Context context, AdEventListener listener, AdMetadata metadata, byte[] content) throws AdViewFactoryException {
         switch (metadata.contentType) {
             case AdContentTypes.HTML:
-                return StaticAdViewFactory.create(context, listener, metadata, content);
+                return HtmlAdViewFactory.create(context, listener, metadata, content);
             default:
                 throw AdViewFactoryException.UnknownAdTypeException;
         }
