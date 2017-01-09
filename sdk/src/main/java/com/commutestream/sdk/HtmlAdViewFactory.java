@@ -17,7 +17,6 @@ import java.nio.charset.StandardCharsets;
 public class HtmlAdViewFactory {
     public static View create(final Context context, final AdEventListener listener,
                               final AdMetadata metadata, final byte[] content) {
-
         String html = new String(content);
 
         // create a new webview and put the ad in it

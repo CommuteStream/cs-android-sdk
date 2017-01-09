@@ -5,6 +5,7 @@ package com.commutestream.sdk;
  * responses to Ad Requests.
  */
 interface AdResponseHandler {
-    void onSuccess(AdMetadata metadata, byte[] content);
+    void onFound(AdMetadata metadata, byte[] content);
+    void onNotFound();
     void onError(Throwable error);
 }

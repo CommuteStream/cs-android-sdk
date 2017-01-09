@@ -25,10 +25,18 @@ public class HttpClientTest {
         AdRequest req = new AdRequest();
         AdResponseHandler handler = new AdResponseHandler() {
             @Override
-            public void onSuccess(AdMetadata metadata, byte[] content) {
+            public void onFound(AdMetadata metadata, byte[] content) {
                 assertThat(content).isNotEmpty();
                 assertThat(metadata.clickUrl).isNotEmpty();
                 assertThat(metadata.requestTime).isGreaterThan(0.0);
+                synchronized (this) {
+                    notifyAll();
+                }
+            }
+
+            @Override
+            public void onNotFound() {
+                fail("Expected success response with an item returned got no match");
                 synchronized (this) {
                     notifyAll();
                 }
@@ -60,8 +68,16 @@ public class HttpClientTest {
         AdRequest req = new AdRequest();
         AdResponseHandler handler = new AdResponseHandler() {
             @Override
-            public void onSuccess(AdMetadata metadata, byte[] content) {
+            public void onFound(AdMetadata metadata, byte[] content) {
                 assertThat(metadata.requestTime).isGreaterThan(0.0);
+                synchronized (this) {
+                    notifyAll();
+                }
+            }
+
+            @Override
+            public void onNotFound() {
+                fail("Expected success response with an item returned got no match");
                 synchronized (this) {
                     notifyAll();
                 }
@@ -70,6 +86,84 @@ public class HttpClientTest {
             @Override
             public void onError(Throwable error) {
                 fail("Expected success response without an item returned got: " + error.toString());
+                synchronized (this) {
+                    notifyAll();
+                }
+            }
+        };
+        client.getAd(req, handler);
+        synchronized (handler) {
+            handler.wait(200);
+        }
+    }
+
+    @Test
+    public void getAdNotFound() throws Exception {
+        MockWebServer server = new MockWebServer();
+        server.enqueue(new MockResponse()
+                .setResponseCode(404));
+        HttpUrl baseUrl = server.url("/");
+        HttpClient client = new HttpClient(baseUrl);
+        AdRequest req = new AdRequest();
+        AdResponseHandler handler = new AdResponseHandler() {
+            @Override
+            public void onFound(AdMetadata metadata, byte[] content) {
+                fail("Expected failure response");
+                synchronized (this) {
+                    notifyAll();
+                }
+            }
+
+            @Override
+            public void onNotFound() {
+                synchronized (this) {
+                    notifyAll();
+                }
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                fail("Expected Not Found response");
+                assertThat(error).isNotNull();
+                synchronized (this) {
+                    notifyAll();
+                }
+            }
+        };
+        client.getAd(req, handler);
+        synchronized (handler) {
+            handler.wait(200);
+        }
+    }
+
+    @Test
+    public void getAdTemporaryOutage() throws Exception {
+        MockWebServer server = new MockWebServer();
+        server.enqueue(new MockResponse()
+                .setResponseCode(503));
+        HttpUrl baseUrl = server.url("/");
+        HttpClient client = new HttpClient(baseUrl);
+        AdRequest req = new AdRequest();
+        AdResponseHandler handler = new AdResponseHandler() {
+            @Override
+            public void onFound(AdMetadata metadata, byte[] content) {
+                fail("Expected not found response");
+                synchronized (this) {
+                    notifyAll();
+                }
+            }
+
+            @Override
+            public void onNotFound() {
+                synchronized (this) {
+                    notifyAll();
+                }
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                fail("Expected not found response");
+                assertThat(error).isNotNull();
                 synchronized (this) {
                     notifyAll();
                 }
@@ -91,7 +185,15 @@ public class HttpClientTest {
         AdRequest req = new AdRequest();
         AdResponseHandler handler = new AdResponseHandler() {
             @Override
-            public void onSuccess(AdMetadata metadata, byte[] content) {
+            public void onFound(AdMetadata metadata, byte[] content) {
+                fail("Expected failure response");
+                synchronized (this) {
+                    notifyAll();
+                }
+            }
+
+            @Override
+            public void onNotFound() {
                 fail("Expected failure response");
                 synchronized (this) {
                     notifyAll();

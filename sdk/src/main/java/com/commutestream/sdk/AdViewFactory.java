@@ -9,8 +9,8 @@ import android.view.View;
 public class AdViewFactory {
 
     static public View build(Context context, AdEventListener listener, AdMetadata metadata, byte[] content) throws AdViewFactoryException {
-        switch (metadata.contentType) {
-            case AdContentTypes.HTML:
+        switch (metadata.kind) {
+            case AdKinds.HTML:
                 return HtmlAdViewFactory.create(context, listener, metadata, content);
             default:
                 throw AdViewFactoryException.UnknownAdTypeException;

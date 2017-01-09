@@ -1,12 +1,14 @@
 package com.commutestream.sdk;
 
+import android.util.Log;
+
 /**
  * AdMetadata  contains the decoded header, or metadata, from all http ad request responses along
  * with a validate method which ensures the contained metadata conforms to expectations.
  */
 public class AdMetadata {
     public long requestID = 0;
-    public String contentType = null;
+    public String kind = null;
     public double requestTime = 0.0;
     public int width = 0;
     public int height = 0;
@@ -17,8 +19,9 @@ public class AdMetadata {
         if(requestID == 0) {
             throw AdMetadataException.InvalidRequestIDException;
         }
-        if(contentType != AdContentTypes.HTML && contentType != AdContentTypes.MRAID) {
-            throw AdMetadataException.InvalidContentTypeException;
+        Log.d("CS_SDK", "Kind " + kind);
+        if(!(kind.equalsIgnoreCase(AdKinds.HTML) || kind.equalsIgnoreCase(AdKinds.MRAID))) {
+            throw AdMetadataException.InvalidKindException;
         }
         if(requestTime <= 0.0) {
             throw AdMetadataException.InvalidRequestTimeException;

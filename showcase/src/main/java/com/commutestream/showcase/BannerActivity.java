@@ -8,7 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.commutestream.sdk.AdContentTypes;
+import com.commutestream.sdk.AdKinds;
 import com.commutestream.sdk.AdEventListener;
 import com.commutestream.sdk.AdMetadata;
 import com.commutestream.sdk.HtmlAdViewFactory;
@@ -41,7 +41,7 @@ public class BannerActivity extends AppCompatActivity  {
             AdMetadata metadata = new AdMetadata();
             metadata.width = 320;
             metadata.height = 50;
-            metadata.contentType = AdContentTypes.HTML;
+            metadata.kind = AdKinds.HTML;
             metadata.requestTime = 0.1;
             metadata.requestID = 1;
             metadata.clickUrl = "https://commutestream.com";

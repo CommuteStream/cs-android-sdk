@@ -479,13 +479,18 @@ public class CommuteStream {
     public static synchronized void getAd(final Context context, final AdHandler handler, final AdEventListener listener) {
         getClient().getAd(nextRequest(true), new AdResponseHandler() {
             @Override
-            public void onSuccess(AdMetadata metadata, byte[] content) {
+            public void onFound(AdMetadata metadata, byte[] content) {
                 try {
                     View view = AdViewFactory.build(context, listener, metadata, content);
-                    handler.onAd(metadata, view);
+                    handler.onFound(metadata, view);
                 } catch (Throwable error) {
                     handler.onError(error);
                 }
+            }
+
+            @Override
+            public void onNotFound() {
+                handler.onNotFound();
             }
 
             @Override
