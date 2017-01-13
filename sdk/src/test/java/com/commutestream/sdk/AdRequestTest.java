@@ -14,12 +14,10 @@ public class AdRequestTest {
         req.setSdkVersion("sdkVersion");
         req.setAppName("appName");
         req.setAppVersion("appVersion");
-        req.setAidMd5("aidMd5");
-        req.setAidSha("aidSha");
         req.setAdUnitUuid("adUnit");
         req.setTesting(false);
-        req.setBannerHeight(500);
-        req.setBannerWidth(200);
+        req.setViewHeight(500);
+        req.setViewWidth(200);
         return req;
     }
 
@@ -34,12 +32,10 @@ public class AdRequestTest {
         assertThat(req.getSdkVersion()).isEqualTo(req0.getSdkVersion());
         assertThat(req.getAppName()).isEqualTo(req0.getAppName());
         assertThat(req.getAppVersion()).isEqualTo(req0.getAppVersion());
-        assertThat(req.getAidMd5()).isEqualTo(req0.getAidMd5());
-        assertThat(req.getAidSha()).isEqualTo(req0.getAidSha());
         assertThat(req.getAdUnitUuid()).isEqualTo(req0.getAdUnitUuid());
         assertThat(req.isTesting()).isEqualTo(req0.isTesting());
-        assertThat(req.getBannerHeight()).isEqualTo(req0.getBannerHeight());
-        assertThat(req.getBannerWidth()).isEqualTo(req0.getBannerWidth());
+        assertThat(req.getViewHeight()).isEqualTo(req0.getViewHeight());
+        assertThat(req.getViewWidth()).isEqualTo(req0.getViewWidth());
         assertThat(req0.isSkipFetch()).isFalse();
         assertThat(req0.getAgencyInterests()).isEmpty();
     }

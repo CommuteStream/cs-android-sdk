@@ -17,9 +17,11 @@ public class AdView extends FrameLayout implements VisibilityListener, Interacti
     boolean mImpressed = false;
     boolean mClicked = false;
 
-    public AdView(Context context, AdEventListener adEventListener) {
+    public AdView(Context context, AdMetadata metadata, AdEventListener adEventListener) {
         super(context);
         init(adEventListener);
+        // scale and fit accordingly
+        setLayoutParams(new LayoutParams(metadata.viewWidth, metadata.viewHeight));
     }
 
     public void setContentView(View view) {

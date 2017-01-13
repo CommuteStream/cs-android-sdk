@@ -10,8 +10,10 @@ public class AdMetadata {
     public long requestID = 0;
     public String kind = null;
     public double requestTime = 0.0;
-    public int width = 0;
-    public int height = 0;
+    public int viewWidth = 0;
+    public int viewHeight = 0;
+    public int adWidth = 0;
+    public int adHeight = 0;
     public String impressionUrl = null;
     public String clickUrl = null;
 
@@ -20,17 +22,24 @@ public class AdMetadata {
             throw AdMetadataException.InvalidRequestIDException;
         }
         Log.d("CS_SDK", "Kind " + kind);
-        if(!(kind.equalsIgnoreCase(AdKinds.HTML) || kind.equalsIgnoreCase(AdKinds.MRAID))) {
-            throw AdMetadataException.InvalidKindException;
-        }
+
         if(requestTime <= 0.0) {
             throw AdMetadataException.InvalidRequestTimeException;
         }
-        if(width <= 0) {
-            throw AdMetadataException.InvalidWidthException;
+        if(!(kind.equalsIgnoreCase(AdKinds.HTML) || kind.equalsIgnoreCase(AdKinds.MRAID))) {
+            throw AdMetadataException.InvalidAdKindException;
         }
-        if(height <= 0) {
-            throw AdMetadataException.InvalidHeightException;
+        if(adWidth <= 0) {
+            throw AdMetadataException.InvalidAdWidthException;
+        }
+        if(adHeight <= 0) {
+            throw AdMetadataException.InvalidAdHeightException;
+        }
+        if(viewWidth <= 0) {
+            throw AdMetadataException.InvalidViewWidthException;
+        }
+        if(viewHeight <= 0) {
+            throw AdMetadataException.InvalidViewHeightException;
         }
         if(impressionUrl == null) {
             throw AdMetadataException.InvalidImpressionUrlException;

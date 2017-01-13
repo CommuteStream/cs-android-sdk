@@ -39,8 +39,8 @@ public class BannerActivity extends AppCompatActivity  {
             getAssets().open("seahorse/index.html", AssetManager.ACCESS_BUFFER).read(html);
             String redirectUrl = "https://commutestream.com";
             AdMetadata metadata = new AdMetadata();
-            metadata.width = 320;
-            metadata.height = 50;
+            metadata.adWidth = 320;
+            metadata.adHeight = 50;
             metadata.kind = AdKinds.HTML;
             metadata.requestTime = 0.1;
             metadata.requestID = 1;

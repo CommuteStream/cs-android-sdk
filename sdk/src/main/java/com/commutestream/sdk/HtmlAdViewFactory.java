@@ -10,6 +10,7 @@ import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AbsoluteLayout;
 import android.widget.RelativeLayout;
 
 import java.nio.charset.StandardCharsets;
@@ -35,14 +36,11 @@ public class HtmlAdViewFactory {
         webView.setHorizontalScrollBarEnabled(false);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadData(html, "text/html", null);
-
-        webView.setLayoutParams(new RelativeLayout.LayoutParams(metadata.width,
-                metadata.height));
         webView.getSettings().setUseWideViewPort(true);
         webView.getSettings().setLoadWithOverviewMode(true);
 
 
-        final AdView adView = new AdView(context, listener);
+        final AdView adView = new AdView(context, metadata, listener);
         adView.setContentView(webView);
         webView.setWebViewClient(new WebClient(new UrlHandler() {
             @Override

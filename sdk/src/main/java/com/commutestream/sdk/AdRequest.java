@@ -17,13 +17,11 @@ public class AdRequest {
     private static String appVersion;
     private static String sdkName;
     private static String sdkVersion;
-    private static String aidSha;
-    private static String aidMd5;
     private static String aaid;
     private static String theme;
     private static String adUnitUuid;
-    private static int bannerHeight;
-    private static int bannerWidth;
+    private static int viewHeight;
+    private static int viewWidth;
 
     private boolean skipFetch = false;
     private Location location;
@@ -34,20 +32,20 @@ public class AdRequest {
         this.setAgencyInterests(new HashSet<AgencyInterest>());
     }
 
-    public static int getBannerWidth() {
-        return bannerWidth;
+    public static int getViewWidth() {
+        return viewWidth;
     }
 
-    public static void setBannerWidth(int bannerWidth) {
-        AdRequest.bannerWidth = bannerWidth;
+    public static void setViewWidth(int viewWidth) {
+        AdRequest.viewWidth = viewWidth;
     }
 
-    public static int getBannerHeight() {
-        return bannerHeight;
+    public static int getViewHeight() {
+        return viewHeight;
     }
 
-    public static void setBannerHeight(int bannerHeight) {
-        AdRequest.bannerHeight = bannerHeight;
+    public static void setViewHeight(int viewHeight) {
+        AdRequest.viewHeight = viewHeight;
     }
 
     public static String getAdUnitUuid() {
@@ -64,22 +62,6 @@ public class AdRequest {
 
     public static void setTheme(String theme) {
         AdRequest.theme = theme;
-    }
-
-    public static String getAidMd5() {
-        return aidMd5;
-    }
-
-    public static void setAidMd5(String aidMd5) {
-        AdRequest.aidMd5 = aidMd5;
-    }
-
-    public static String getAidSha() {
-        return aidSha;
-    }
-
-    public static void setAidSha(String aidSha) {
-        AdRequest.aidSha = aidSha;
     }
 
     public static String getAAID() {

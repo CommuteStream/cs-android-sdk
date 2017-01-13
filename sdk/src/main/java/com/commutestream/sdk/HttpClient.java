@@ -57,7 +57,7 @@ class HttpClient implements Client {
     }
 
     @Override
-    public void getAd(AdRequest adRequest, final AdResponseHandler adHandler) {
+    public void getAd(final AdRequest adRequest, final AdResponseHandler adHandler) {
         final long startTime = System.nanoTime();
         TimeZone tz = TimeZone.getDefault();
         String tzName = tz.getDisplayName(false, TimeZone.LONG);
@@ -117,11 +117,13 @@ class HttpClient implements Client {
                         String widthStr = response.header(HttpClient.AD_WIDTH_HEADER);
                         String heightStr = response.header(HttpClient.AD_HEIGHT_HEADER);
                         if (widthStr != null && heightStr != null) {
-                            metadata.width = Integer.parseInt(widthStr);
-                            metadata.height = Integer.parseInt(heightStr);
+                            metadata.adWidth = Integer.parseInt(widthStr);
+                            metadata.adHeight = Integer.parseInt(heightStr);
                         } else {
                             logger.debug("CS_SDK", "width and height are " + widthStr + "," + heightStr);
                         }
+                        metadata.viewHeight = adRequest.getViewHeight();
+                        metadata.viewWidth = adRequest.getViewWidth();
                         metadata.requestTime = endTime - startTime;
 
                         metadata.validate();

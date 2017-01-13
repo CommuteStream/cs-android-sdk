@@ -49,7 +49,6 @@ public class CommuteStream {
         CommuteStream.setSdkVersion(CommuteStream.version);
         CommuteStream.setAppName(ContextUtils.getAppName(context));
         CommuteStream.setAppVersion(ContextUtils.getAppVersion(context));
-        CommuteStream.setAid(ContextUtils.getAndroidID(context));
         CommuteStream.lookupAAID(context);
         CommuteStream.setAdUnitUuid(adUnit);
         if (!isInitialized()) {
@@ -205,34 +204,6 @@ public class CommuteStream {
      */
     public static synchronized String getAAID() { return CommuteStream.request.getAAID(); }
 
-    /**
-     * Set the android device ID
-     *
-     * @param aid Android ID
-     */
-    public static synchronized void setAid(String aid) {
-        CommuteStream.request.setAidSha(CommuteStream.hashString("SHA", aid));
-        CommuteStream.request.setAidMd5(CommuteStream.hashString("MD5", aid));
-        Log.v("CS_SDK", "Set AndroidID SHA to " + getAidSha());
-    }
-
-    /**
-     * Get the android device ID SHA hash
-     *
-     * @return aidSha Base64 encoded SHA of the Android ID
-     */
-    public static synchronized String getAidSha() {
-        return CommuteStream.request.getAidSha();
-    }
-
-    /**
-     * Get the android device ID MD5 hash sum value
-     *
-     * @return aidMd5 Base64 encoded MD5 of the Android ID
-     */
-    public static synchronized String getAidMd5() {
-        return CommuteStream.request.getAidMd5();
-    }
 
     /**
      * Get the banner height
@@ -240,7 +211,7 @@ public class CommuteStream {
      * @return bannerHeight Banner height
      */
     public static synchronized int getBannerHeight() {
-        return CommuteStream.request.getBannerHeight();
+        return CommuteStream.request.getViewHeight();
     }
 
     /**
@@ -249,7 +220,7 @@ public class CommuteStream {
      * @param bannerHeight Banner Height
      */
     public static synchronized void setBannerHeight(int bannerHeight) {
-        CommuteStream.request.setBannerHeight(bannerHeight);
+        CommuteStream.request.setViewHeight(bannerHeight);
     }
 
     /**
@@ -258,7 +229,7 @@ public class CommuteStream {
      * @return bannerWidth Banner Width
      */
     public static synchronized int getBannerWidth() {
-        return CommuteStream.request.getBannerWidth();
+        return CommuteStream.request.getViewWidth();
     }
 
     /**
@@ -267,7 +238,7 @@ public class CommuteStream {
      * @param bannerWidth Banner Width
      */
     public static synchronized void setBannerWidth(int bannerWidth) {
-        CommuteStream.request.setBannerWidth(bannerWidth);
+        CommuteStream.request.setViewWidth(bannerWidth);
     }
 
     /**

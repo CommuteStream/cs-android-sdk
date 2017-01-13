@@ -39,9 +39,7 @@ public class SDKTest {
     public void isInitialized() {
         assertThat(CommuteStream.isInitialized()).isTrue();
         assertThat(CommuteStream.getAppName()).isNotEmpty();
-        assertThat(CommuteStream.getAppVersion()).isNotEmpty();
-        assertThat(CommuteStream.getAidSha()).isNotEmpty();
-        assertThat(CommuteStream.getAidMd5()).isNotEmpty();
+        assertThat(CommuteStream.getAppVersion()).isNotEmpty(); 
     }
 
     @Test

@@ -3,10 +3,12 @@ package com.commutestream.sdk_test;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +22,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 
@@ -76,14 +79,6 @@ public class MainActivity extends Activity {
         ListView lvRecent = (ListView) findViewById(R.id.recentInterests);
         lvRecent.setAdapter(mInterestAdapter);
 
-        Button bRandomAid = (Button) findViewById(R.id.randomAid);
-        bRandomAid.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                randomAid();
-            }
-        });
-
         Button bRandomInterest = (Button) findViewById(R.id.randomAgencyInterest);
         bRandomInterest.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,14 +116,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    /**
-     * Pick a random android id to ensure a more likely clean history
-     */
-    protected void randomAid() {
-        long i = rand.nextLong();
-        CommuteStream.setAid(Long.toHexString(i));
-        mInterestAdapter.clear();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
