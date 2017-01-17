@@ -5,6 +5,7 @@ import java.util.TimeZone;
 import android.location.Location;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,10 +52,10 @@ class HttpClient implements Client {
         mClient = new OkHttpClient.Builder().addInterceptor(new HttpLogger()).build();
     }
 
-    @Override
-    public void postUpdates(UpdateRequest updates, final UpdateResponseHandler updateHandler) {
-        final long startTime = System.nanoTime();
-    }
+    //@Override
+    //public void postUpdates(UpdateRequest updates, final UpdateResponseHandler updateHandler) {
+    //    final long startTime = System.nanoTime();
+    //}
 
     @Override
     public void getAd(final AdRequest adRequest, final AdResponseHandler adHandler) {
@@ -92,19 +93,9 @@ class HttpClient implements Client {
             @Override
             public void onResponse(Call call, Response response) {
                 if (response.code() == 404 || response.code() == 503) {
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            adHandler.onNotFound();
-                        }
-                    });
+                    adHandler.notFound();
                 } else if (!response.isSuccessful()) {
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            adHandler.onError(HttpFailure);
-                        }
-                    });
+                    adHandler.error(HttpFailure);
                 } else {
                     try {
                         final long endTime = System.nanoTime();
@@ -125,25 +116,57 @@ class HttpClient implements Client {
                         metadata.viewHeight = adRequest.getViewHeight();
                         metadata.viewWidth = adRequest.getViewWidth();
                         metadata.requestTime = endTime - startTime;
-
                         metadata.validate();
-                        final AdMetadata metadata0 = metadata;
-                        final byte[] bodyBytes = body.bytes();
+                        byte[] bodyBytes = body.bytes();
                         body.close();
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                adHandler.onFound(metadata0, bodyBytes);
-                            }
-                        });
+                        adHandler.found(metadata, bodyBytes);
                     } catch (final Throwable t) {
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                adHandler.onError(t);
-                            }
-                        });
+                        adHandler.error(t);
                     }
+                }
+            }
+        };
+        mClient.newCall(request).enqueue(callback);
+    }
+
+    /**
+     * Send server an impression event
+     * @param metadata
+     */
+    public void sendImpression(AdMetadata metadata) {
+       getUrl(metadata.impressionUrl);
+    }
+
+    /**
+     * Send server a click event
+     * @param metadata
+     */
+    public void sendClick(AdMetadata metadata) {
+        getUrl(metadata.clickUrl);
+    }
+
+    void getUrl(String url) {
+        retryGetUrl(url, 100, 10);
+    }
+
+    void retryGetUrl(final String url, final int retryDelay, final int retriesRemaining) {
+        if(retriesRemaining == 0) {
+            Log.w("CS_SDK", "Failed to send request to " + url);
+        }
+        Request request = new Request.Builder()
+                .get()
+                .url(url).build();
+        Callback callback = new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                // retry in a bit in the further in the future with a maximum time between retries
+                retryGetUrl(url, retryDelay*2, retriesRemaining-1);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if(!response.isRedirect() && !response.isSuccessful()) {
+                    retryGetUrl(url, retryDelay*2, retriesRemaining-1);
                 }
             }
         };

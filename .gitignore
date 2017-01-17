@@ -38,3 +38,4 @@ sdk/build
 /.idea/libraries
 .DS_Store
 /build
+/captures

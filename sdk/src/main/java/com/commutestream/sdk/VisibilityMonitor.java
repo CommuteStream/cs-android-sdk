@@ -2,35 +2,68 @@ package com.commutestream.sdk;
 
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewTreeObserver;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Monitor a view for visibility on screen, notifying a VisibilityListener
  * when a View becomes Visible on the device screen.
  */
-public class VisibilityMonitor implements ViewTreeObserver.OnGlobalLayoutListener, ViewTreeObserver.OnScrollChangedListener, View.OnLayoutChangeListener {
+public class VisibilityMonitor {
 
-    private VisibilityListener mListener;
-    private View mView;
+    final private VisibilityListener mListener;
+    final private View mView;
     private boolean mVisible = false;
+    private Timer mTimer;
+    private TimerTask mTimerTask;
+    private Rect mGlobalVisibleRect = new Rect();
+    private Rect mViewVisibleRect = new Rect();
+    private Point mViewOffsetPoint = new Point();
 
-    public VisibilityMonitor(View view, VisibilityListener listener) {
+    public VisibilityMonitor(final View view, final VisibilityListener listener) {
         mView = view;
         mListener = listener;
-        mView.getViewTreeObserver().addOnGlobalLayoutListener(this);
-        mView.getViewTreeObserver().addOnScrollChangedListener(this);
-        mView.addOnLayoutChangeListener(this);
+        mTimer = new Timer("CS SDK Ad Visibility Monitor", true);
+        startMonitoring();
+    }
+
+    public void stopMonitoring() {
+        Log.d("CS_SDK", "cancelling visibility timer task " + mTimerTask.toString());
+        mTimerTask.cancel();
+        mTimer.purge();
+    }
+
+    public void startMonitoring() {
+        if(mTimerTask != null) {
+            stopMonitoring();
+        }
+        final VisibilityMonitor monitor = this;
+        mTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        monitor.checkVisible();
+                    }
+                });
+            }
+        };
+        mTimer.scheduleAtFixedRate(mTimerTask, 1000, 1000);
         checkVisible();
     }
 
     private boolean isVisible() {
-        Rect globalVisibleRect = new Rect();
-        Rect viewVisibleRect = new Rect();
-        Point viewOffsetPoint = new Point();
-        mView.getRootView().getGlobalVisibleRect(globalVisibleRect);
-        mView.getGlobalVisibleRect(viewVisibleRect, viewOffsetPoint);
-        return mView.getVisibility() == View.VISIBLE && Rect.intersects(globalVisibleRect, viewVisibleRect);
+        mView.getRootView().getGlobalVisibleRect(mGlobalVisibleRect);
+        mView.getGlobalVisibleRect(mViewVisibleRect, mViewOffsetPoint);
+        boolean visible = mView.isShown() && Rect.intersects(mGlobalVisibleRect, mViewVisibleRect);
+        Log.d("CS_SDK", "AdView visibility " + visible);
+        return visible;
     }
 
     private void checkVisible() {
@@ -43,21 +76,5 @@ public class VisibilityMonitor implements ViewTreeObserver.OnGlobalLayoutListene
                 mListener.onHidden(mView);
             }
         }
-    }
-
-    @Override
-    public void onGlobalLayout() {
-        checkVisible();
-
-    }
-
-    @Override
-    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-        checkVisible();
-    }
-
-    @Override
-    public void onScrollChanged() {
-        checkVisible();
     }
 }

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ToggleButton;
@@ -32,9 +33,11 @@ public class MainActivity extends Activity {
     private ArrayList<AgencyInterest> mKnownInterests = new ArrayList<>();
     private ArrayList<AgencyInterest> mRecentInterests = new ArrayList<>();
     private InterestAdapter mInterestAdapter;
+    private AdView mAdView;
 
     private void fillKnownInterests() {
         // top 10 interests found in db
+        /*
         mKnownInterests.add(new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "cta", "Red", "41420"));
         mKnownInterests.add(new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "cta", "Red", "41450"));
         mKnownInterests.add(new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "cta", null, null));
@@ -42,12 +45,15 @@ public class MainActivity extends Activity {
         mKnownInterests.add(new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "cta", "Brn", "30257"));
         mKnownInterests.add(new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "cta", "77", "7947"));
         mKnownInterests.add(new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "cta", "77", "17380"));
-        mKnownInterests.add(new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "cta", "74", "1225"));
+        */
+        mKnownInterests.add(new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "cta", "74", "1240"));
+        mKnownInterests.add(new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "cta", "74", "1332"));
+        /*
         mKnownInterests.add(new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "cta", "Red", "30289"));
         mKnownInterests.add(new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "cta", "80", "5676"));
         mKnownInterests.add(new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "cta", "Red", "30269"));
         mKnownInterests.add(new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "cta", "67", "14139"));
-
+        */
     }
 
     @Override
@@ -57,10 +63,12 @@ public class MainActivity extends Activity {
         fillKnownInterests();
         CommuteStream.init(this, "c69d1610-92c1-4ddb-a72c-d44560496c10");
 
+        //WebView.setWebContentsDebuggingEnabled(true);
+
         mInterestAdapter = new InterestAdapter(this, mRecentInterests);
 
 
-        AdView mAdView = (AdView) findViewById(R.id.adView);
+        mAdView = (AdView) findViewById(R.id.adView);
         AdRequest.Builder adRequestBuilder = new AdRequest.Builder();
 
         // Location information if available
@@ -137,5 +145,27 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        mAdView.resume();
+    }
+
+    @Override
+    public void onPause() {
+        mAdView.pause();
+
+        super.onPause();
+
+    }
+
+    @Override
+    public void onDestroy() {
+        mAdView.destroy();
+
+        super.onDestroy();
     }
 }

@@ -1,7 +1,7 @@
 package com.commutestream.sdk;
 
 public interface AdHandler {
-    void onFound(AdMetadata metadata, AdView view);
+    void onFound(AdController controller);
     void onNotFound();
     void onError(Throwable error);
 }

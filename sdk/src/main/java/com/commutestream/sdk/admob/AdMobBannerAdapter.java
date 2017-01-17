@@ -2,18 +2,16 @@ package com.commutestream.sdk.admob;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
-import android.view.View;
 
+import android.util.Log;
+
+import com.commutestream.sdk.AdController;
 import com.commutestream.sdk.AdHandler;
 import com.commutestream.sdk.AdMetadata;
 import com.commutestream.sdk.AdView;
 import com.commutestream.sdk.CommuteStream;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.formats.NativeAdOptions;
 import com.google.android.gms.ads.mediation.MediationAdRequest;
 import com.google.android.gms.ads.mediation.customevent.CustomEventBanner;
 import com.google.android.gms.ads.mediation.customevent.CustomEventBannerListener;
@@ -27,7 +25,7 @@ import com.google.android.gms.ads.mediation.customevent.CustomEventBannerListene
  */
 public class AdMobBannerAdapter implements CustomEventBanner {
 
-    private AdView mAdView;
+    private AdController mAdController;
 
     @Override
     public void requestBannerAd(final Context context, final CustomEventBannerListener listener,
@@ -40,12 +38,12 @@ public class AdMobBannerAdapter implements CustomEventBanner {
         AdMobEventForwarder adMobEventForwarder = new AdMobEventForwarder(listener);
         CommuteStream.setBannerHeight(size.getHeightInPixels(context));
         CommuteStream.setBannerWidth(size.getWidthInPixels(context));
-        final AdMobBannerAdapter mAdapter = this;
+        final AdMobBannerAdapter adMobAdapter = this;
         CommuteStream.getAd(context, new AdHandler() {
             @Override
-            public void onFound(AdMetadata metadata, final AdView view) {
-                listener.onAdLoaded(view);
-                mAdapter.setAdView(view);
+            public void onFound(final AdController controller) {
+                adMobAdapter.setAdController(controller);
+                listener.onAdLoaded(controller.getAdView());
             }
 
             @Override
@@ -56,29 +54,38 @@ public class AdMobBannerAdapter implements CustomEventBanner {
             @Override
             public void onError(Throwable error) {
                 Log.v("CS_SDK", "Ad Error - " + error.getMessage());
+
                 listener.onAdFailedToLoad(AdRequest.ERROR_CODE_NETWORK_ERROR);
             }
         }, adMobEventForwarder);
     }
 
-    private void setAdView(AdView view) {
-        mAdView = view;
-    }
-
     @Override
     public void onDestroy() {
-        // Do Nothing
+        if(mAdController != null) {
+            mAdController.onDestroy();
+        }
+        mAdController = null;
     }
 
     @Override
     public void onResume() {
-        // Do nothing
-        mAdView.onResume();
+        if(mAdController != null) {
+            mAdController.onResume();
+        }
     }
 
     @Override
     public void onPause() {
-        mAdView.onPause();
-        // Do nothing
+        if(mAdController != null) {
+            mAdController.onPause();
+        }
+    }
+
+    private void setAdController(AdController adController) {
+        if(mAdController != null) {
+            mAdController.onDestroy();
+        }
+        mAdController = adController;
     }
 }

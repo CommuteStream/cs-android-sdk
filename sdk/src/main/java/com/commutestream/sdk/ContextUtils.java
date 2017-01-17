@@ -2,15 +2,10 @@ package com.commutestream.sdk;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.provider.Settings;
 import android.util.Log;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
-import java.io.IOException;
 
 /**
  * Utility functions to use against an android context
@@ -29,11 +24,6 @@ public class ContextUtils {
             Log.v("CS_SDK", "App Version Not Found");
         }
         return appVersion;
-    }
-
-    static String getAndroidID(Context context) {
-        return Settings.Secure.getString(context.getContentResolver(),
-                Settings.Secure.ANDROID_ID);
     }
 
     /**

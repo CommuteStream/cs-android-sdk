@@ -8,10 +8,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.commutestream.sdk.AdController;
 import com.commutestream.sdk.AdKinds;
 import com.commutestream.sdk.AdEventListener;
 import com.commutestream.sdk.AdMetadata;
-import com.commutestream.sdk.HtmlAdViewFactory;
+import com.commutestream.sdk.HtmlAdControllerFactory;
 import com.commutestream.sdk.VisibilityListener;
 import com.commutestream.sdk.VisibilityMonitor;
 
@@ -47,8 +48,8 @@ public class BannerActivity extends AppCompatActivity  {
             metadata.clickUrl = "https://commutestream.com";
             metadata.impressionUrl = "https://commutestream.com";
             byte[] html2 = "<a href=\"https://commutestream.com\"><h1>CommuteStream</h1></a>".getBytes();
-            View bannerView = HtmlAdViewFactory.create(getApplicationContext(), listener, metadata, html2);
-            mVisibilityMonitor = new VisibilityMonitor(bannerView, new VisibilityListener() {
+            AdController adController = HtmlAdControllerFactory.create(getApplicationContext(), listener, metadata, html2);
+            mVisibilityMonitor = new VisibilityMonitor(adController.getAdView(), new VisibilityListener() {
                 @Override
                 public void onVisible(View view) {
                     Log.v("CS_SHOWCASE", "Banner Visible");
@@ -60,7 +61,7 @@ public class BannerActivity extends AppCompatActivity  {
                 }
             });
             FrameLayout bannerFrame = (FrameLayout) findViewById(R.id.bannerAdFrame);
-            bannerFrame.addView(bannerView);
+            bannerFrame.addView(adController.getAdView());
         } catch (Exception e) {
             Log.d("SHOWCASE", "Failed to load banner " + e.getMessage());
         }

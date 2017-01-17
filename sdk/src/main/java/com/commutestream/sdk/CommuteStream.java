@@ -4,7 +4,6 @@ import android.content.Context;
 import android.location.Location;
 import android.util.Base64;
 import android.util.Log;
-import android.view.View;
 
 import java.security.MessageDigest;
 import java.util.concurrent.ScheduledExecutorService;
@@ -452,8 +451,8 @@ public class CommuteStream {
             @Override
             public void onFound(AdMetadata metadata, byte[] content) {
                 try {
-                    AdView view = AdViewFactory.build(context, listener, metadata, content);
-                    handler.onFound(metadata, view);
+                    AdController controller = AdControllerFactory.build(context, listener, metadata, content);
+                    handler.onFound(controller);
                 } catch (Throwable error) {
                     handler.onError(error);
                 }
