@@ -9,7 +9,7 @@ import android.widget.FrameLayout;
  * AdView holds any other View which may be an advertisement taking note of visibility
  * changes and interactions that may be considered a "click"
  */
-public class AdView extends FrameLayout implements VisibilityListener, InteractionListener {
+public class AdView extends FrameLayout {
     View mContentView;
     VisibilityMonitor mVisibilityMonitor;
     InteractionMonitor mInteractionMonitor;
@@ -25,8 +25,6 @@ public class AdView extends FrameLayout implements VisibilityListener, Interacti
     }
 
     public void setContentView(View view) {
-        mVisibilityMonitor = new VisibilityMonitor(this, view);
-        mInteractionMonitor = new InteractionMonitor(this, view);
         if(mContentView != null) {
             removeView(mContentView);
         }
@@ -36,8 +34,31 @@ public class AdView extends FrameLayout implements VisibilityListener, Interacti
 
     private void init(AdEventListener adEventListener) {
         mAdEventListener = adEventListener;
-        mVisibilityMonitor = new VisibilityMonitor(this, this);
-        mInteractionMonitor = new InteractionMonitor(this, this);
+        final AdView mAdView = this;
+        mVisibilityMonitor = new VisibilityMonitor(this, new VisibilityListener() {
+            @Override
+            public void onVisible(View view) {
+                mAdView.impressed();
+            }
+
+            @Override
+            public void onHidden(View view) {
+
+            }
+        });
+        mInteractionMonitor = new InteractionMonitor(this, new InteractionListener() {
+            @Override
+            public void onTap(View view) {
+                mAdView.clicked();
+            }
+        });
+    }
+
+    public void onPause() {
+    }
+
+    public void onResume() {
+
     }
 
     public boolean wasImpressed() {
@@ -46,20 +67,6 @@ public class AdView extends FrameLayout implements VisibilityListener, Interacti
 
     public boolean wasClicked() {
         return mClicked;
-    }
-
-    @Override
-    public void onVisible(View view) {
-        impressed();
-    }
-
-    @Override
-    public void onHidden(View view) {
-    }
-
-    @Override
-    public void onTap(View view) {
-        clicked();
     }
 
     private void impressed() {

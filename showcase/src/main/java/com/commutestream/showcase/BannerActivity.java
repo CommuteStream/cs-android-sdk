@@ -48,7 +48,7 @@ public class BannerActivity extends AppCompatActivity  {
             metadata.impressionUrl = "https://commutestream.com";
             byte[] html2 = "<a href=\"https://commutestream.com\"><h1>CommuteStream</h1></a>".getBytes();
             View bannerView = HtmlAdViewFactory.create(getApplicationContext(), listener, metadata, html2);
-            mVisibilityMonitor = new VisibilityMonitor(new VisibilityListener() {
+            mVisibilityMonitor = new VisibilityMonitor(bannerView, new VisibilityListener() {
                 @Override
                 public void onVisible(View view) {
                     Log.v("CS_SHOWCASE", "Banner Visible");
@@ -58,7 +58,7 @@ public class BannerActivity extends AppCompatActivity  {
                 public void onHidden(View view) {
                     Log.v("CS_SHOWCASE", "Banner Hidden");
                 }
-            }, bannerView);
+            });
             FrameLayout bannerFrame = (FrameLayout) findViewById(R.id.bannerAdFrame);
             bannerFrame.addView(bannerView);
         } catch (Exception e) {

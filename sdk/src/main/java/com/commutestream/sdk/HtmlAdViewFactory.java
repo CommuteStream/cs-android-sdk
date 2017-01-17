@@ -1,22 +1,16 @@
 package com.commutestream.sdk;
 
-import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
-import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.AbsoluteLayout;
-import android.widget.RelativeLayout;
-
-import java.nio.charset.StandardCharsets;
 
 public class HtmlAdViewFactory {
-    public static View create(final Context context, final AdEventListener listener,
+    public static AdView create(final Context context, final AdEventListener listener,
                               final AdMetadata metadata, final byte[] content) {
         String html = new String(content);
 

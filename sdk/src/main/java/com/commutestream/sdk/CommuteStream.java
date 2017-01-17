@@ -452,7 +452,7 @@ public class CommuteStream {
             @Override
             public void onFound(AdMetadata metadata, byte[] content) {
                 try {
-                    View view = AdViewFactory.build(context, listener, metadata, content);
+                    AdView view = AdViewFactory.build(context, listener, metadata, content);
                     handler.onFound(metadata, view);
                 } catch (Throwable error) {
                     handler.onError(error);

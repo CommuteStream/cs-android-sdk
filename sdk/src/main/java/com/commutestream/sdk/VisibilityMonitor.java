@@ -15,9 +15,9 @@ public class VisibilityMonitor implements ViewTreeObserver.OnGlobalLayoutListene
     private View mView;
     private boolean mVisible = false;
 
-    public VisibilityMonitor(VisibilityListener listener, View view) {
-        mListener = listener;
+    public VisibilityMonitor(View view, VisibilityListener listener) {
         mView = view;
+        mListener = listener;
         mView.getViewTreeObserver().addOnGlobalLayoutListener(this);
         mView.getViewTreeObserver().addOnScrollChangedListener(this);
         mView.addOnLayoutChangeListener(this);

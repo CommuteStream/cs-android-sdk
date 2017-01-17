@@ -8,7 +8,7 @@ import android.view.View;
  */
 public class AdViewFactory {
 
-    static public View build(Context context, AdEventListener listener, AdMetadata metadata, byte[] content) throws AdViewFactoryException {
+    static public AdView build(Context context, AdEventListener listener, AdMetadata metadata, byte[] content) throws AdViewFactoryException {
         switch (metadata.kind) {
             case AdKinds.HTML:
                 return HtmlAdViewFactory.create(context, listener, metadata, content);

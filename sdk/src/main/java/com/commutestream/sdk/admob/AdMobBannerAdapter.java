@@ -9,6 +9,7 @@ import android.view.View;
 
 import com.commutestream.sdk.AdHandler;
 import com.commutestream.sdk.AdMetadata;
+import com.commutestream.sdk.AdView;
 import com.commutestream.sdk.CommuteStream;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdRequest;
@@ -26,7 +27,7 @@ import com.google.android.gms.ads.mediation.customevent.CustomEventBannerListene
  */
 public class AdMobBannerAdapter implements CustomEventBanner {
 
-    private View adView;
+    private AdView mAdView;
 
     @Override
     public void requestBannerAd(final Context context, final CustomEventBannerListener listener,
@@ -39,10 +40,12 @@ public class AdMobBannerAdapter implements CustomEventBanner {
         AdMobEventForwarder adMobEventForwarder = new AdMobEventForwarder(listener);
         CommuteStream.setBannerHeight(size.getHeightInPixels(context));
         CommuteStream.setBannerWidth(size.getWidthInPixels(context));
+        final AdMobBannerAdapter mAdapter = this;
         CommuteStream.getAd(context, new AdHandler() {
             @Override
-            public void onFound(AdMetadata metadata, final View view) {
+            public void onFound(AdMetadata metadata, final AdView view) {
                 listener.onAdLoaded(view);
+                mAdapter.setAdView(view);
             }
 
             @Override
@@ -58,7 +61,11 @@ public class AdMobBannerAdapter implements CustomEventBanner {
         }, adMobEventForwarder);
     }
 
-        @Override
+    private void setAdView(AdView view) {
+        mAdView = view;
+    }
+
+    @Override
     public void onDestroy() {
         // Do Nothing
     }
@@ -66,10 +73,12 @@ public class AdMobBannerAdapter implements CustomEventBanner {
     @Override
     public void onResume() {
         // Do nothing
+        mAdView.onResume();
     }
 
     @Override
     public void onPause() {
+        mAdView.onPause();
         // Do nothing
     }
 }

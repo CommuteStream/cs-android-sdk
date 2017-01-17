@@ -14,9 +14,9 @@ public class InteractionMonitor implements View.OnTouchListener, GestureDetector
     View mView;
     GestureDetector mGestureDetector;
 
-    public InteractionMonitor(InteractionListener listener, View view) {
-        mListener = listener;
+    public InteractionMonitor(View view, InteractionListener listener) {
         mView = view;
+        mListener = listener;
         mGestureDetector = new GestureDetector(view.getContext(), this);
         mView.setOnTouchListener(this);
     }
