@@ -151,7 +151,7 @@ class HttpClient implements Client {
 
     void retryGetUrl(final String url, final int retryDelay, final int retriesRemaining) {
         if(retriesRemaining == 0) {
-            Log.w("CS_SDK", "Failed to send request to " + url);
+            Log.e("CS_SDK", "Failed to send request to " + url);
         }
         Request request = new Request.Builder()
                 .get()

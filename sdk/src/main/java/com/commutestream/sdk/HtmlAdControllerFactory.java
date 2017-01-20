@@ -2,6 +2,7 @@ package com.commutestream.sdk;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.ConsoleMessage;
 import android.webkit.WebChromeClient;
@@ -38,11 +39,9 @@ public class HtmlAdControllerFactory {
         webView.getSettings().setLoadWithOverviewMode(true);
         webView.getSettings().setDomStorageEnabled(true);
 
-
-        final AdView adView = new AdView(context);
         final UrlHandler urlHandler = new UrlHandler(context);
-        final AdController adController = new AdController(metadata, adView, urlHandler);
-        adView.setContentView(webView);
+        final AdController adController = new AdController(context, metadata, webView, urlHandler);
+
         webView.setWebViewClient(new WebClient(urlHandler));
         webView.loadData(html, "text/html", null);
         return adController;

@@ -1,5 +1,6 @@
 package com.commutestream.sdk;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.View;
 
@@ -11,13 +12,24 @@ public class AdController {
     AdMetadata mAdMetadata;
     AdView mAdView;
     VisibilityMonitor mVisibilityMonitor;
-    InteractionMonitor mInteractionMonitor;
     UrlHandler mUrlHandler;
 
-    AdController(AdMetadata adMetadata, AdView adView, UrlHandler urlHandler) {
+    AdController(Context context, AdMetadata adMetadata, View view, UrlHandler urlHandler) {
         mAdMetadata = adMetadata;
-        mAdView = adView;
         mUrlHandler = urlHandler;
+
+        mAdView = new AdView(context, new InteractionListener() {
+            @Override
+            public void onTap(View view) {
+                Log.v("CS_SDK", "onTap AdController");
+                if(mUrlHandler.enable()) {
+                    Log.d("CS_SDK", "Adapter saw interaction, sending click");
+                    CommuteStream.getClient().sendClick(mAdMetadata);
+                }
+            }
+        });
+
+        mAdView.setContentView(view);
 
         mVisibilityMonitor = new VisibilityMonitor(mAdView, new VisibilityListener() {
             @Override
@@ -32,15 +44,6 @@ public class AdController {
             }
         });
 
-        mInteractionMonitor = new InteractionMonitor(mAdView, new InteractionListener() {
-            @Override
-            public void onTap(View view) {
-                if(mUrlHandler.enable()) {
-                    Log.d("CS_SDK", "Adapter saw interaction, sending click");
-                    CommuteStream.getClient().sendClick(mAdMetadata);
-                }
-            }
-        });
     }
 
     public AdView getAdView() {
