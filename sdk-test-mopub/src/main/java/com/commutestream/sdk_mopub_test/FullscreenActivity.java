@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.commutestream.sdk.CommuteStream;
 import com.mopub.mobileads.MoPubView;
 
 /**
@@ -108,6 +109,8 @@ public class FullscreenActivity extends AppCompatActivity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
+
+        //CommuteStream.init(getApplicationContext(), "c69d1610-92c1-4ddb-a72c-d44560496c10");
 
         MoPubView moPubView;
         moPubView = (MoPubView) findViewById(R.id.adview);
