@@ -32,6 +32,9 @@ public class AdMobBannerAdapter implements CustomEventBanner {
                                 final String serverParameter, final AdSize size,
                                 final MediationAdRequest mediationAdRequest,
                                 final Bundle customEventExtras) {
+
+        Log.v("CS_SDK", "requestBannerAd called");
+
         if(!CommuteStream.isInitialized()) {
             CommuteStream.init(context, serverParameter);
         }
