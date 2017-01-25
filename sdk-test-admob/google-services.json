@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "1079263761462",
+    "firebase_url": "https://sdk-admob-test.firebaseio.com",
+    "project_id": "sdk-admob-test",
+    "storage_bucket": "sdk-admob-test.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1079263761462:android:cc13b6eb1a9bbf8e",
+        "android_client_info": {
+          "package_name": "com.commutestream.sdk_test_admob"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1079263761462-k730g1i91fip3rfo0arue17lbg6kisus.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJ2Ioxi2jFWxOyGKl_bi-NfaWSyFuvsnc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
