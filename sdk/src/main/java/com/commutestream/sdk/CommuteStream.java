@@ -6,6 +6,8 @@ import android.util.Base64;
 import android.util.Log;
 
 import java.security.MessageDigest;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -20,23 +22,16 @@ import okhttp3.HttpUrl;
  * if it's within a view that gets destroyed and re-created
  */
 public class CommuteStream {
+
     private static int requestsBeforeInit = 0;
     private static final String version = BuildConfig.VERSION_NAME;
     private static final int TWO_MINUTES = 1000 * 60 * 2;
-    private static boolean initialized = false;
     private static HttpClient httpClient;
     private static AdRequest request = new AdRequest();
     private static ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
     private static Runnable updater = new Updater();
     private static ScheduledFuture scheduledUpdate;
-
-    /**
-     * Initialize CommuteStream
-     *
-     * @deprecated Use init(Context context, String adunit) instead
-     */
-    public static void init() {
-    }
+    private static QueuedAdRequest pendingRequest;
 
     /**
      * Initialize CommuteStream using an Android Context and AdUnit
@@ -48,11 +43,8 @@ public class CommuteStream {
         CommuteStream.setSdkVersion(CommuteStream.version);
         CommuteStream.setAppName(ContextUtils.getAppName(context));
         CommuteStream.setAppVersion(ContextUtils.getAppVersion(context));
-        CommuteStream.lookupAAID(context);
         CommuteStream.setAdUnitUuid(adUnit);
-        if (!isInitialized()) {
-            CommuteStream.setInitialized(true);
-        }
+        CommuteStream.lookupAAID(context);
     }
 
     /**
@@ -80,17 +72,7 @@ public class CommuteStream {
      * @return true if initialized, false otherwise
      */
     public synchronized static boolean isInitialized() {
-        return CommuteStream.initialized;
-    }
-
-    /**
-     * Set the initialized flag
-     *
-     * @param initialized
-     */
-    private static void setInitialized(boolean initialized) {
-        CommuteStream.initialized = initialized;
-        scheduleUpdate();
+        return CommuteStream.request.getAdUnitUuid() != null && CommuteStream.request.getAAID() != null;
     }
 
     /**
@@ -109,6 +91,9 @@ public class CommuteStream {
      */
     public static synchronized void setAdUnitUuid(String adUnitUuid) {
         CommuteStream.request.setAdUnitUuid(adUnitUuid);
+        if(isInitialized()) {
+            doPending();
+        }
     }
 
     /**
@@ -194,7 +179,12 @@ public class CommuteStream {
      *
      * @param aaid
      */
-    public static synchronized void setAAID(String aaid) { CommuteStream.request.setAAID(aaid); }
+    public static synchronized void setAAID(String aaid) {
+        CommuteStream.request.setAAID(aaid);
+        if(isInitialized()) {
+            doPending();
+        }
+    }
 
     /**
      * Get the assigned android advertising ID
@@ -447,7 +437,41 @@ public class CommuteStream {
      * @param handler response handler
      */
     public static synchronized void getAd(final Context context, final AdHandler handler, final AdEventListener listener) {
-        getClient().getAd(nextRequest(true), new AdResponseHandler() {
+        if(isInitialized()) {
+            clearPending();
+            doGetAd(context, nextRequest(true), handler, listener);
+        } else {
+            setPending(context, nextRequest(true), handler, listener);
+        }
+    }
+
+    private static void setPending(final Context context, final AdRequest request, final AdHandler handler, final AdEventListener listener) {
+        if(pendingRequest != null) {
+            clearPending();
+        }
+        pendingRequest = new QueuedAdRequest();
+        pendingRequest.context = context;
+        pendingRequest.request = request;
+        pendingRequest.handler = handler;
+        pendingRequest.listener = listener;
+    }
+
+    private static void doPending() {
+        if(pendingRequest != null) {
+            doGetAd(pendingRequest.context, pendingRequest.request, pendingRequest.handler, pendingRequest.listener);
+            pendingRequest = null;
+        }
+    }
+
+    private static void clearPending() {
+        if(pendingRequest != null) {
+            pendingRequest.handler.onNotFound();
+            pendingRequest = null;
+        }
+    }
+
+    private static void doGetAd(final Context context, final AdRequest request, final AdHandler handler, final AdEventListener listener) {
+        getClient().getAd(request, new AdResponseHandler() {
             @Override
             public void onFound(AdMetadata metadata, byte[] content) {
                 try {
