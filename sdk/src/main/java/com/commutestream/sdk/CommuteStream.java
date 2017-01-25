@@ -363,8 +363,6 @@ public class CommuteStream {
      * This lets us bundle updates rather than sending individual requests for each one
      */
     private synchronized static void scheduleUpdate() {
-        Log.v("CS_SDK", "Schedule Update");
-
         if(!isInitialized()) {
             requestsBeforeInit += 1;
         }
@@ -382,8 +380,9 @@ public class CommuteStream {
 
         // After 15 seconds from the first update made we send a request to the server
         // containing all the client updates
-        scheduledUpdate = scheduler.schedule(updater, 15, TimeUnit.SECONDS);
-        Log.v("CS_SDK", "Scheduled Update");
+        int seconds = 15;
+        scheduledUpdate = scheduler.schedule(updater, seconds, TimeUnit.SECONDS);
+        Log.v("CS_SDK", "Scheduled sending an update in " + seconds + " seconds");
     }
 
     private synchronized static void setSessionID(String sessionID) {
@@ -512,10 +511,26 @@ public class CommuteStream {
      * Request update
      * @param handler update response handler
      */
-    static void requestUpdate(UpdateResponseHandler handler) {
-        //AdRequest request = nextRequest(false);
-        //request.setSkipFetch(true);
-        //getClient().getAd(request, handler);
+    static void requestUpdate(final UpdateResponseHandler handler) {
+        AdRequest request = nextRequest(false);
+        request.setSkipFetch(true);
+        getClient().getAd(request, new AdResponseHandler() {
+            @Override
+            void onFound(AdMetadata metadata, byte[] content) {
+                // unexpected!
+                Log.e("CS_SDK", "Unexpectedly saw an Ad Found response from an update!");
+            }
+
+            @Override
+            void onNotFound() {
+                // expected, do nothing
+            }
+
+            @Override
+            void onError(Throwable error) {
+                handler.onError(error);
+            }
+        });
     }
 
     /**

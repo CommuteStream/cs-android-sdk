@@ -21,9 +21,7 @@ public class AdController {
         mAdView = new AdView(context, new InteractionListener() {
             @Override
             public void onTap(View view) {
-                Log.v("CS_SDK", "onTap AdController");
                 if(mUrlHandler.enable()) {
-                    Log.d("CS_SDK", "Adapter saw interaction, sending click");
                     CommuteStream.getClient().sendClick(mAdMetadata);
                 }
             }
@@ -34,7 +32,6 @@ public class AdController {
         mVisibilityMonitor = new VisibilityMonitor(mAdView, new VisibilityListener() {
             @Override
             public void onVisible(View view) {
-                Log.d("CS_SDK", "Adapter saw visible, sending impression");
                 CommuteStream.getClient().sendImpression(mAdMetadata);
             }
 

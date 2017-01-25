@@ -33,7 +33,6 @@ public class VisibilityMonitor {
     }
 
     public void stopMonitoring() {
-        Log.d("CS_SDK", "cancelling visibility timer task " + mTimerTask.toString());
         mTimerTask.cancel();
         mTimer.purge();
     }
