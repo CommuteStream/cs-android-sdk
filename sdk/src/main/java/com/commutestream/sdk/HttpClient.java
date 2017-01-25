@@ -60,8 +60,7 @@ class HttpClient implements Client {
     @Override
     public void getAd(final AdRequest adRequest, final AdResponseHandler adHandler) {
         final long startTime = System.nanoTime();
-        TimeZone tz = TimeZone.getDefault();
-        String tzName = tz.getDisplayName(false, TimeZone.LONG);
+
 
         Location loc = adRequest.getLocation();
         Set<AgencyInterest> agency_interests = adRequest.getAgencyInterests();
@@ -69,7 +68,7 @@ class HttpClient implements Client {
          HttpUrl.Builder urlBuilder = mBaseURL.newBuilder("/v2/banner")
                 .addQueryParameter("aaid", adRequest.getAAID())
                 .addQueryParameter("ad_unit_uuid", adRequest.getAdUnitUuid())
-                .addQueryParameter("timezone", tzName);
+                .addQueryParameter("timezone", adRequest.getTimezone());
         if(loc != null) {
             urlBuilder.addQueryParameter("lat", Double.toString(loc.getLatitude()));
             urlBuilder.addQueryParameter("lon", Double.toString(loc.getLongitude()));
