@@ -66,9 +66,10 @@ class HttpClient implements Client {
         Set<AgencyInterest> agency_interests = adRequest.getAgencyInterests();
 
          HttpUrl.Builder urlBuilder = mBaseURL.newBuilder("/v2/banner")
-                .addQueryParameter("aaid", adRequest.getAAID())
-                .addQueryParameter("ad_unit_uuid", adRequest.getAdUnitUuid())
-                .addQueryParameter("timezone", adRequest.getTimezone());
+                 .addQueryParameter("session_id", adRequest.getSessionID())
+                 .addQueryParameter("aaid", adRequest.getAAID())
+                 .addQueryParameter("ad_unit_uuid", adRequest.getAdUnitUuid())
+                 .addQueryParameter("timezone", adRequest.getTimezone());
         if(loc != null) {
             urlBuilder.addQueryParameter("lat", Double.toString(loc.getLatitude()));
             urlBuilder.addQueryParameter("lon", Double.toString(loc.getLongitude()));

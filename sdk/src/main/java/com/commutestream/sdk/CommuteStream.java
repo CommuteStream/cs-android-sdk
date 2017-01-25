@@ -6,6 +6,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.concurrent.ScheduledExecutorService;
@@ -40,6 +41,7 @@ public class CommuteStream {
      * @param adUnit ad unit uuid
      */
     public synchronized static void init(Context context, String adUnit) {
+        CommuteStream.setSessionID(generateSessionID());
         CommuteStream.setSdkVersion(CommuteStream.version);
         CommuteStream.setAppName(ContextUtils.getAppName(context));
         CommuteStream.setAppVersion(ContextUtils.getAppVersion(context));
@@ -384,6 +386,10 @@ public class CommuteStream {
         Log.v("CS_SDK", "Scheduled Update");
     }
 
+    private synchronized static void setSessionID(String sessionID) {
+        CommuteStream.request.setSessionID(sessionID);
+    }
+
     /**
      * Get the CommuteStream API Singleton Client
      *
@@ -615,5 +621,16 @@ public class CommuteStream {
             return null;
         }
         return hashed;
+    }
+
+    /**
+     * Generate a base64 encoded 16 byte random session id unique to this instance of CommuteStream
+     */
+    private static String generateSessionID() {
+        SecureRandom random = new SecureRandom();
+        byte[] randomBytes = new byte[16];
+        random.nextBytes(randomBytes);
+        byte[] encodedBytes = Base64.encode(randomBytes, Base64.URL_SAFE);
+        return new String(encodedBytes);
     }
 }

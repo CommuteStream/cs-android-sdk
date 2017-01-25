@@ -62,7 +62,6 @@ public class VisibilityMonitor {
         mView.getRootView().getGlobalVisibleRect(mGlobalVisibleRect);
         mView.getGlobalVisibleRect(mViewVisibleRect, mViewOffsetPoint);
         boolean visible = mView.isShown() && Rect.intersects(mGlobalVisibleRect, mViewVisibleRect);
-        Log.d("CS_SDK", "AdView visibility " + visible);
         return visible;
     }
 

@@ -19,6 +19,7 @@ public class AdRequest {
     private static String appVersion;
     private static String sdkName;
     private static String sdkVersion;
+    private static String sessionID;
     private static String aaid;
     private static String theme;
     private static String adUnitUuid;
@@ -34,6 +35,14 @@ public class AdRequest {
         this.setAgencyInterests(new HashSet<AgencyInterest>());
         TimeZone tz = TimeZone.getDefault();
         this.timezone = tz.getID();
+    }
+
+    void setSessionID(String sessionID) {
+        this.sessionID = sessionID;
+    }
+
+    String getSessionID() {
+        return sessionID;
     }
 
     public String getTimezone() { return timezone; }
