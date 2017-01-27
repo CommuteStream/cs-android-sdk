@@ -34,6 +34,9 @@ class HttpClient implements Client {
     private static String AD_WIDTH_HEADER = "X-CS-AD-WIDTH";
     private static String AD_HEIGHT_HEADER = "X-CS-AD-HEIGHT";
 
+    private Location lastLocationSentAttempted;
+    private Location lastLocationSentConfirmed;
+
     final Logger logger = LoggerFactory.getLogger(HttpLogger.class);
 
     private HttpUrl mBaseURL = new HttpUrl.Builder().scheme("https").host("api.commutestream.com").build();
@@ -63,17 +66,33 @@ class HttpClient implements Client {
         TimeZone tz = TimeZone.getDefault();
         String tzName = tz.getDisplayName(false, TimeZone.LONG);
 
-        Location loc = adRequest.getLocation();
         Set<AgencyInterest> agency_interests = adRequest.getAgencyInterests();
 
          HttpUrl.Builder urlBuilder = mBaseURL.newBuilder("/v2/banner")
                 .addQueryParameter("aaid", adRequest.getAAID())
                 .addQueryParameter("ad_unit_uuid", adRequest.getAdUnitUuid())
                 .addQueryParameter("timezone", tzName);
+
+        Location loc = adRequest.getLocation();
+
+        //prevent resending the same location twice
+        if(loc == null){
+            Log.d("CS_SDK", "No location to send");
+        }
+        else if(lastLocationSentConfirmed == loc){
+            loc = null;
+            Log.d("CS_SDK", "Duplicate location detected - not sending");
+        }
+        else{
+            lastLocationSentAttempted = loc;
+            Log.d("CS_SDK", "Sending new location.");
+        }
+
         if(loc != null) {
             urlBuilder.addQueryParameter("lat", Double.toString(loc.getLatitude()));
             urlBuilder.addQueryParameter("lon", Double.toString(loc.getLongitude()));
             urlBuilder.addQueryParameter("fix_time", Double.toString(loc.getTime()));
+            urlBuilder.addQueryParameter("acc", Double.toString(loc.getAccuracy()));
         }
         if(!agency_interests.isEmpty()) {
             urlBuilder.addQueryParameter("agency_interests", AgencyInterestCSVEncoder.Encode(adRequest.getAgencyInterests()));
@@ -120,6 +139,7 @@ class HttpClient implements Client {
                         byte[] bodyBytes = body.bytes();
                         body.close();
                         adHandler.found(metadata, bodyBytes);
+                        lastLocationSentConfirmed = lastLocationSentAttempted;
                     } catch (final Throwable t) {
                         adHandler.error(t);
                     }
