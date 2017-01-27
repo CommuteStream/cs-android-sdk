@@ -33,6 +33,8 @@ class HttpClient implements Client {
     private static String AD_KIND_HEADER = "X-CS-AD-KIND";
     private static String AD_WIDTH_HEADER = "X-CS-AD-WIDTH";
     private static String AD_HEIGHT_HEADER = "X-CS-AD-HEIGHT";
+    private Location lastLocationSentConfirmed;
+    private Location lastLocationSentAttempted;
 
     final Logger logger = LoggerFactory.getLogger(HttpLogger.class);
 
@@ -60,7 +62,6 @@ class HttpClient implements Client {
     @Override
     public void getAd(final AdRequest adRequest, final AdResponseHandler adHandler) {
         final long startTime = System.nanoTime();
-
 
         Set<AgencyInterest> agency_interests = adRequest.getAgencyInterests();
 
