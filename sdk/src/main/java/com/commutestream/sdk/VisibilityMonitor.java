@@ -33,7 +33,6 @@ public class VisibilityMonitor {
     }
 
     public void stopMonitoring() {
-        Log.d("CS_SDK", "cancelling visibility timer task " + mTimerTask.toString());
         mTimerTask.cancel();
         mTimer.purge();
     }
@@ -62,7 +61,6 @@ public class VisibilityMonitor {
         mView.getRootView().getGlobalVisibleRect(mGlobalVisibleRect);
         mView.getGlobalVisibleRect(mViewVisibleRect, mViewOffsetPoint);
         boolean visible = mView.isShown() && Rect.intersects(mGlobalVisibleRect, mViewVisibleRect);
-        Log.d("CS_SDK", "AdView visibility " + visible);
         return visible;
     }
 

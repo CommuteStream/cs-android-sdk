@@ -34,9 +34,6 @@ class HttpClient implements Client {
     private static String AD_WIDTH_HEADER = "X-CS-AD-WIDTH";
     private static String AD_HEIGHT_HEADER = "X-CS-AD-HEIGHT";
 
-    private Location lastLocationSentAttempted;
-    private Location lastLocationSentConfirmed;
-
     final Logger logger = LoggerFactory.getLogger(HttpLogger.class);
 
     private HttpUrl mBaseURL = new HttpUrl.Builder().scheme("https").host("api.commutestream.com").build();
@@ -63,15 +60,15 @@ class HttpClient implements Client {
     @Override
     public void getAd(final AdRequest adRequest, final AdResponseHandler adHandler) {
         final long startTime = System.nanoTime();
-        TimeZone tz = TimeZone.getDefault();
-        String tzName = tz.getDisplayName(false, TimeZone.LONG);
+
 
         Set<AgencyInterest> agency_interests = adRequest.getAgencyInterests();
 
          HttpUrl.Builder urlBuilder = mBaseURL.newBuilder("/v2/banner")
-                .addQueryParameter("aaid", adRequest.getAAID())
-                .addQueryParameter("ad_unit_uuid", adRequest.getAdUnitUuid())
-                .addQueryParameter("timezone", tzName);
+                 .addQueryParameter("session_id", adRequest.getSessionID())
+                 .addQueryParameter("aaid", adRequest.getAAID())
+                 .addQueryParameter("ad_unit_uuid", adRequest.getAdUnitUuid())
+                 .addQueryParameter("timezone", adRequest.getTimezone());
 
         Location loc = adRequest.getLocation();
 

@@ -6,6 +6,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.concurrent.ScheduledExecutorService;
@@ -39,6 +40,7 @@ public class CommuteStream {
      * @param adUnit ad unit uuid
      */
     public synchronized static void init(Context context, String adUnit) {
+        CommuteStream.setSessionID(generateSessionID());
         CommuteStream.setSdkVersion(CommuteStream.version);
         CommuteStream.setAppName(ContextUtils.getAppName(context));
         CommuteStream.setAppVersion(ContextUtils.getAppVersion(context));
@@ -357,8 +359,6 @@ public class CommuteStream {
      * This lets us bundle updates rather than sending individual requests for each one
      */
     private synchronized static void scheduleUpdate() {
-        Log.v("CS_SDK", "Schedule Update");
-
         if(!isInitialized()) {
             requestsBeforeInit += 1;
         }
@@ -376,8 +376,13 @@ public class CommuteStream {
 
         // After 15 seconds from the first update made we send a request to the server
         // containing all the client updates
-        scheduledUpdate = scheduler.schedule(updater, 15, TimeUnit.SECONDS);
-        Log.v("CS_SDK", "Scheduled Update");
+        int seconds = 15;
+        scheduledUpdate = scheduler.schedule(updater, seconds, TimeUnit.SECONDS);
+        Log.v("CS_SDK", "Scheduled sending an update in " + seconds + " seconds");
+    }
+
+    private synchronized static void setSessionID(String sessionID) {
+        CommuteStream.request.setSessionID(sessionID);
     }
 
     /**
@@ -509,10 +514,26 @@ public class CommuteStream {
      * Request update
      * @param handler update response handler
      */
-    static void requestUpdate(UpdateResponseHandler handler) {
-        //AdRequest request = nextRequest(false);
-        //request.setSkipFetch(true);
-        //getClient().getAd(request, handler);
+    static void requestUpdate(final UpdateResponseHandler handler) {
+        AdRequest request = nextRequest(false);
+        request.setSkipFetch(true);
+        getClient().getAd(request, new AdResponseHandler() {
+            @Override
+            void onFound(AdMetadata metadata, byte[] content) {
+                // unexpected!
+                Log.e("CS_SDK", "Unexpectedly saw an Ad Found response from an update!");
+            }
+
+            @Override
+            void onNotFound() {
+                // expected, do nothing
+            }
+
+            @Override
+            void onError(Throwable error) {
+                handler.onError(error);
+            }
+        });
     }
 
     /**
@@ -552,5 +573,16 @@ public class CommuteStream {
             return null;
         }
         return hashed;
+    }
+
+    /**
+     * Generate a base64 encoded 16 byte random session id unique to this instance of CommuteStream
+     */
+    private static String generateSessionID() {
+        SecureRandom random = new SecureRandom();
+        byte[] randomBytes = new byte[16];
+        random.nextBytes(randomBytes);
+        byte[] encodedBytes = Base64.encode(randomBytes, Base64.URL_SAFE);
+        return new String(encodedBytes);
     }
 }
