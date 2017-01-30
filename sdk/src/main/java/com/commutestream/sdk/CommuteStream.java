@@ -6,6 +6,9 @@ import android.util.Base64;
 import android.util.Log;
 
 import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -20,23 +23,15 @@ import okhttp3.HttpUrl;
  * if it's within a view that gets destroyed and re-created
  */
 public class CommuteStream {
+
     private static int requestsBeforeInit = 0;
     private static final String version = BuildConfig.VERSION_NAME;
-    private static final int TWO_MINUTES = 1000 * 60 * 2;
-    private static boolean initialized = false;
     private static HttpClient httpClient;
     private static AdRequest request = new AdRequest();
     private static ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(1);
     private static Runnable updater = new Updater();
     private static ScheduledFuture scheduledUpdate;
-
-    /**
-     * Initialize CommuteStream
-     *
-     * @deprecated Use init(Context context, String adunit) instead
-     */
-    public static void init() {
-    }
+    private static QueuedAdRequest pendingRequest;
 
     /**
      * Initialize CommuteStream using an Android Context and AdUnit
@@ -45,14 +40,12 @@ public class CommuteStream {
      * @param adUnit ad unit uuid
      */
     public synchronized static void init(Context context, String adUnit) {
+        CommuteStream.setSessionID(generateSessionID());
         CommuteStream.setSdkVersion(CommuteStream.version);
         CommuteStream.setAppName(ContextUtils.getAppName(context));
         CommuteStream.setAppVersion(ContextUtils.getAppVersion(context));
-        CommuteStream.lookupAAID(context);
         CommuteStream.setAdUnitUuid(adUnit);
-        if (!isInitialized()) {
-            CommuteStream.setInitialized(true);
-        }
+        CommuteStream.lookupAAID(context);
     }
 
     /**
@@ -80,17 +73,7 @@ public class CommuteStream {
      * @return true if initialized, false otherwise
      */
     public synchronized static boolean isInitialized() {
-        return CommuteStream.initialized;
-    }
-
-    /**
-     * Set the initialized flag
-     *
-     * @param initialized
-     */
-    private static void setInitialized(boolean initialized) {
-        CommuteStream.initialized = initialized;
-        scheduleUpdate();
+        return CommuteStream.request.getAdUnitUuid() != null && CommuteStream.request.getAAID() != null;
     }
 
     /**
@@ -109,6 +92,9 @@ public class CommuteStream {
      */
     public static synchronized void setAdUnitUuid(String adUnitUuid) {
         CommuteStream.request.setAdUnitUuid(adUnitUuid);
+        if(isInitialized()) {
+            doPending();
+        }
     }
 
     /**
@@ -194,7 +180,12 @@ public class CommuteStream {
      *
      * @param aaid
      */
-    public static synchronized void setAAID(String aaid) { CommuteStream.request.setAAID(aaid); }
+    public static synchronized void setAAID(String aaid) {
+        CommuteStream.request.setAAID(aaid);
+        if(isInitialized()) {
+            doPending();
+        }
+    }
 
     /**
      * Get the assigned android advertising ID
@@ -318,10 +309,7 @@ public class CommuteStream {
      * @param location Location of the device
      */
     public static synchronized void setLocation(Location location) {
-        if (isBetterLocation(location, CommuteStream.request.getLocation())) {
-            CommuteStream.getRequest().setLocation(location);
-            CommuteStream.scheduleUpdate();
-        }
+        CommuteStream.getRequest().setLocation(location);
     }
 
     /**
@@ -371,8 +359,6 @@ public class CommuteStream {
      * This lets us bundle updates rather than sending individual requests for each one
      */
     private synchronized static void scheduleUpdate() {
-        Log.v("CS_SDK", "Schedule Update");
-
         if(!isInitialized()) {
             requestsBeforeInit += 1;
         }
@@ -390,8 +376,13 @@ public class CommuteStream {
 
         // After 15 seconds from the first update made we send a request to the server
         // containing all the client updates
-        scheduledUpdate = scheduler.schedule(updater, 15, TimeUnit.SECONDS);
-        Log.v("CS_SDK", "Scheduled Update");
+        int seconds = 15;
+        scheduledUpdate = scheduler.schedule(updater, seconds, TimeUnit.SECONDS);
+        Log.v("CS_SDK", "Scheduled sending an update in " + seconds + " seconds");
+    }
+
+    private synchronized static void setSessionID(String sessionID) {
+        CommuteStream.request.setSessionID(sessionID);
     }
 
     /**
@@ -447,7 +438,48 @@ public class CommuteStream {
      * @param handler response handler
      */
     public static synchronized void getAd(final Context context, final AdHandler handler, final AdEventListener listener) {
-        getClient().getAd(nextRequest(true), new AdResponseHandler() {
+
+        //try grabbing a new location to send - if we have one set it for delivery
+        Location newLocation = DeviceLocation.getBestLocation(context);
+        if(newLocation != null){
+            setLocation(newLocation);
+        }
+
+        if(isInitialized()) {
+            clearPending();
+            doGetAd(context, nextRequest(true), handler, listener);
+        } else {
+            setPending(context, nextRequest(true), handler, listener);
+        }
+    }
+
+    private static void setPending(final Context context, final AdRequest request, final AdHandler handler, final AdEventListener listener) {
+        if(pendingRequest != null) {
+            clearPending();
+        }
+        pendingRequest = new QueuedAdRequest();
+        pendingRequest.context = context;
+        pendingRequest.request = request;
+        pendingRequest.handler = handler;
+        pendingRequest.listener = listener;
+    }
+
+    private static void doPending() {
+        if(pendingRequest != null) {
+            doGetAd(pendingRequest.context, pendingRequest.request, pendingRequest.handler, pendingRequest.listener);
+            pendingRequest = null;
+        }
+    }
+
+    private static void clearPending() {
+        if(pendingRequest != null) {
+            pendingRequest.handler.onNotFound();
+            pendingRequest = null;
+        }
+    }
+
+    private static void doGetAd(final Context context, final AdRequest request, final AdHandler handler, final AdEventListener listener) {
+        getClient().getAd(request, new AdResponseHandler() {
             @Override
             public void onFound(AdMetadata metadata, byte[] content) {
                 try {
@@ -482,10 +514,26 @@ public class CommuteStream {
      * Request update
      * @param handler update response handler
      */
-    static void requestUpdate(UpdateResponseHandler handler) {
-        //AdRequest request = nextRequest(false);
-        //request.setSkipFetch(true);
-        //getClient().getAd(request, handler);
+    static void requestUpdate(final UpdateResponseHandler handler) {
+        AdRequest request = nextRequest(false);
+        request.setSkipFetch(true);
+        getClient().getAd(request, new AdResponseHandler() {
+            @Override
+            void onFound(AdMetadata metadata, byte[] content) {
+                // unexpected!
+                Log.e("CS_SDK", "Unexpectedly saw an Ad Found response from an update!");
+            }
+
+            @Override
+            void onNotFound() {
+                // expected, do nothing
+            }
+
+            @Override
+            void onError(Throwable error) {
+                handler.onError(error);
+            }
+        });
     }
 
     /**
@@ -512,72 +560,6 @@ public class CommuteStream {
         return CommuteStream.request;
     }
 
-    /**
-     * Determines whether one Location reading is better than the current
-     * Location fix
-     *
-     * @param location            The new Location that you want to evaluate
-     * @param currentBestLocation The current Location fix, to which you want to compare the new
-     *                            one
-     */
-    private static boolean isBetterLocation(Location location,
-                                            Location currentBestLocation) {
-        if (currentBestLocation == null) {
-            // A new location is always better than no location
-            return true;
-        }
-
-        // Check whether the new location fix is newer or older
-        long timeDelta = location.getTime() - currentBestLocation.getTime();
-        boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
-        boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
-        boolean isNewer = timeDelta > 0;
-
-        // If it's been more than two minutes since the current location, use
-        // the new location
-        // because the user has likely moved
-        if (isSignificantlyNewer) {
-            return true;
-            // If the new location is more than two minutes older, it must be
-            // worse
-        } else if (isSignificantlyOlder) {
-            return false;
-        }
-
-        // Check whether the new location fix is more or less accurate
-        int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation
-                .getAccuracy());
-        boolean isLessAccurate = accuracyDelta > 0;
-        boolean isMoreAccurate = accuracyDelta < 0;
-        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
-
-        // Check if the old and new location are from the same provider
-        boolean isFromSameProvider = isSameProvider(location.getProvider(),
-                currentBestLocation.getProvider());
-
-        // Determine location quality using a combination of timeliness and
-        // accuracy
-        if (isMoreAccurate) {
-            return true;
-        } else if (isNewer && !isLessAccurate) {
-            return true;
-        } else if (isNewer && !isSignificantlyLessAccurate
-                && isFromSameProvider) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Checks whether two providers are the same
-     */
-    private static boolean isSameProvider(String provider1, String provider2) {
-        if (provider1 == null) {
-            return provider2 == null;
-        }
-        return provider1.equals(provider2);
-    }
-
     private static String hashString(String algorithm, String other) {
         String hashed;
         if (other == null)
@@ -591,5 +573,16 @@ public class CommuteStream {
             return null;
         }
         return hashed;
+    }
+
+    /**
+     * Generate a base64 encoded 16 byte random session id unique to this instance of CommuteStream
+     */
+    private static String generateSessionID() {
+        SecureRandom random = new SecureRandom();
+        byte[] randomBytes = new byte[16];
+        random.nextBytes(randomBytes);
+        byte[] encodedBytes = Base64.encode(randomBytes, Base64.URL_SAFE);
+        return new String(encodedBytes);
     }
 }

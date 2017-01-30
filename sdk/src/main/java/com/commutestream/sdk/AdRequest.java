@@ -1,9 +1,11 @@
 package com.commutestream.sdk;
 
 import android.location.Location;
+import android.util.Log;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TimeZone;
 
 /**
  * AdRequest holds all the parameters for requesting an advertisement
@@ -17,20 +19,33 @@ public class AdRequest {
     private static String appVersion;
     private static String sdkName;
     private static String sdkVersion;
+    private static String sessionID;
     private static String aaid;
     private static String theme;
     private static String adUnitUuid;
     private static int viewHeight;
     private static int viewWidth;
 
+    private String timezone;
     private boolean skipFetch = false;
     private Location location;
-
     private Set<AgencyInterest> agencyInterests;
 
     public AdRequest() {
         this.setAgencyInterests(new HashSet<AgencyInterest>());
+        TimeZone tz = TimeZone.getDefault();
+        this.timezone = tz.getID();
     }
+
+    void setSessionID(String sessionID) {
+        this.sessionID = sessionID;
+    }
+
+    String getSessionID() {
+        return sessionID;
+    }
+
+    public String getTimezone() { return timezone; }
 
     public static int getViewWidth() {
         return viewWidth;

@@ -33,6 +33,8 @@ class HttpClient implements Client {
     private static String AD_KIND_HEADER = "X-CS-AD-KIND";
     private static String AD_WIDTH_HEADER = "X-CS-AD-WIDTH";
     private static String AD_HEIGHT_HEADER = "X-CS-AD-HEIGHT";
+    private Location lastLocationSentConfirmed;
+    private Location lastLocationSentAttempted;
 
     final Logger logger = LoggerFactory.getLogger(HttpLogger.class);
 
@@ -60,20 +62,31 @@ class HttpClient implements Client {
     @Override
     public void getAd(final AdRequest adRequest, final AdResponseHandler adHandler) {
         final long startTime = System.nanoTime();
-        TimeZone tz = TimeZone.getDefault();
-        String tzName = tz.getDisplayName(false, TimeZone.LONG);
 
-        Location loc = adRequest.getLocation();
         Set<AgencyInterest> agency_interests = adRequest.getAgencyInterests();
 
          HttpUrl.Builder urlBuilder = mBaseURL.newBuilder("/v2/banner")
-                .addQueryParameter("aaid", adRequest.getAAID())
-                .addQueryParameter("ad_unit_uuid", adRequest.getAdUnitUuid())
-                .addQueryParameter("timezone", tzName);
+                 .addQueryParameter("session_id", adRequest.getSessionID())
+                 .addQueryParameter("aaid", adRequest.getAAID())
+                 .addQueryParameter("ad_unit_uuid", adRequest.getAdUnitUuid())
+                 .addQueryParameter("timezone", adRequest.getTimezone());
+
+        Location loc = adRequest.getLocation();
+
+        //prevent resending the same location twice
+        if(loc == null){ }
+        else if(lastLocationSentConfirmed == loc){
+            loc = null;
+        }
+        else{
+            lastLocationSentAttempted = loc;
+        }
+
         if(loc != null) {
             urlBuilder.addQueryParameter("lat", Double.toString(loc.getLatitude()));
             urlBuilder.addQueryParameter("lon", Double.toString(loc.getLongitude()));
             urlBuilder.addQueryParameter("fix_time", Double.toString(loc.getTime()));
+            urlBuilder.addQueryParameter("acc", Double.toString(loc.getAccuracy()));
         }
         if(!agency_interests.isEmpty()) {
             urlBuilder.addQueryParameter("agency_interests", AgencyInterestCSVEncoder.Encode(adRequest.getAgencyInterests()));
@@ -120,6 +133,7 @@ class HttpClient implements Client {
                         byte[] bodyBytes = body.bytes();
                         body.close();
                         adHandler.found(metadata, bodyBytes);
+                        lastLocationSentConfirmed = lastLocationSentAttempted;
                     } catch (final Throwable t) {
                         adHandler.error(t);
                     }
