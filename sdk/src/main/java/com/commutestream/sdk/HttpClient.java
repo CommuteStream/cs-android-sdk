@@ -74,16 +74,12 @@ class HttpClient implements Client {
         Location loc = adRequest.getLocation();
 
         //prevent resending the same location twice
-        if(loc == null){
-            Log.d("CS_SDK", "No location to send");
-        }
+        if(loc == null){ }
         else if(lastLocationSentConfirmed == loc){
             loc = null;
-            Log.d("CS_SDK", "Duplicate location detected - not sending");
         }
         else{
             lastLocationSentAttempted = loc;
-            Log.d("CS_SDK", "Sending new location.");
         }
 
         if(loc != null) {

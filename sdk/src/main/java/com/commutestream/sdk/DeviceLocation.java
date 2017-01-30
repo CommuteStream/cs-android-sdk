@@ -51,14 +51,12 @@ public class DeviceLocation {
 
         //if permissions are not granted return null
         if(ContextCompat.checkSelfPermission( context, Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED){
-            Log.d("CS_SDK", "ACCESS_FINE_LOCATION permission not granted - Last GPS location not accessible");
             return null;
         }
 
         //attempt to return the last know location
         final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         try {
-            Log.d("CS_SDK", "GOT A GPS LOCATION");
             return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         } catch (SecurityException e) {
             Log.e("CS_SDK", "GPS SecurityException " + e.toString());
@@ -77,14 +75,12 @@ public class DeviceLocation {
         //if permissions are not granted return null
         if(ContextCompat.checkSelfPermission( context, Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission( context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            Log.d("CS_SDK", "ACCESS_FINE_LOCATION or ACCESS_COARSE_LOCATION permission not granted - Last Network location not accessible") ;
             return null;
         }
 
         //attempt to return the last know location
         final LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         try {
-            Log.d("CS_SDK", "GOT A NETWORK LOCATION");
             return locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         } catch (SecurityException e) {
             Log.e("CS_SDK", "GPS SecurityException " + e.toString());
