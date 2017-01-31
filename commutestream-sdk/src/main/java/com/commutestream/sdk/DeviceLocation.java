@@ -1,6 +1,7 @@
 package com.commutestream.sdk;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -9,18 +10,18 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.support.v4.content.ContextCompat;
 
-/**
- * Created by Sam on 1/26/2017.
- */
-
 public class DeviceLocation {
     private static final int TWO_MINUTES = 1000 * 60 * 2;
     private static Location lastBestLocation;
 
-    //Get the best location from all availible services then check to see if it's better than
-    //the last returned location and return the better of the two.
+    /**
+     * Get the best location from all available services then check to see if it's better than
+     * the last returned location and return the better of the two.
+     *
+     * @return location of device if available, null otherwise
+     */
     @Nullable
-    public static Location getBestLocation(final Context context){
+    static Location getBestLocation(final Context context){
         Location newLocation = getBestLocationAmongLocationServices(context);
         
         if(newLocation != null && isBetterLocation(newLocation, lastBestLocation)){
@@ -31,9 +32,11 @@ public class DeviceLocation {
         }
     }
 
-    //attempt to get the locations from whatever services are availible, then return the best one
+    /**
+     * Attempt to get the locations from whatever services are availible, then return the best one
+     */
     @Nullable
-    public static Location getBestLocationAmongLocationServices(final Context context){
+    static Location getBestLocationAmongLocationServices(final Context context){
         Location gpsLocation = getLastLocationGPS(context);
         Location networkLocation = getLastLocationNetwork(context);
 
@@ -46,6 +49,7 @@ public class DeviceLocation {
     }
 
     //attempts to get the last location from GPS
+    @SuppressLint("MissingPermission")
     @Nullable
     static Location getLastLocationGPS(final Context context){
 

@@ -1,1 +1,1 @@
-include ':sdk', ':sdk-test', ':showcase', ':sdk-test-mopub', ':sdk-mopub', ':sdk-test-admob', ':sdk-admob'
+include ':commutestream-sdk', ':sdk-test', ':showcase', ':sdk-test-mopub', ':commutestream-sdk-mopub', ':sdk-test-admob', ':commutestream-sdk-admob'

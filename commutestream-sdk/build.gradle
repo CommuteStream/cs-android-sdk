@@ -1,0 +1,69 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+ext {
+    bintrayRepo = 'commutestream-sdk'
+    bintrayName = 'commutestream-sdk'
+    bintrayOrg = 'commutestream'
+
+    publishedGroupId = 'com.commutestream.sdk'
+    libraryName = 'CommuteStream SDK'
+    artifact = 'commutestream-sdk'
+
+    libraryDescription = 'SDK that This allows you to add CommuteStream ads to your app.'
+
+    siteUrl = 'https://github.com/commutestream/cs-android-sdk'
+    gitUrl = 'https://github.com/commutestream/cs-android-sdk.git'
+
+    libraryVersion = '0.8.0'
+
+    developerId = ''
+    developerName = 'CommuteStream'
+    developerEmail = 'support@commutestream.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+    defaultConfig {
+        versionCode 800
+        versionName libraryVersion
+        minSdkVersion 14
+        targetSdkVersion 25
+        testApplicationId "com.commutestream.sdk.test"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    lintOptions {
+        lintConfig file("lint.xml")
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}
+
+dependencies {
+    compile 'com.google.firebase:firebase-ads:10.0.1'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    testCompile 'org.robolectric:robolectric:3.2.2'
+    testCompile "junit:junit:4.12"
+    testCompile "org.assertj:assertj-core:1.7.0"
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile 'com.squareup.okhttp3:mockwebserver:3.4.1'
+    androidTestCompile 'com.android.support:support-annotations:25.1.1'
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
+    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
+}
+
+
+apply from: '../install.gradle'
+apply from: '../bintray.gradle'

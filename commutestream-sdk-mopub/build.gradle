@@ -1,0 +1,69 @@
+apply plugin: 'com.android.library'
+
+
+ext {
+    bintrayRepo = 'commutestream-sdk'
+    bintrayName = 'commutestream-sdk-mopub'
+    bintrayOrg = 'commutestream'
+
+    publishedGroupId = 'com.commutestream.sdk.mopub'
+    libraryName = 'CommuteStream SDK for MoPub Mediation'
+    artifact = 'commutestream-sdk-mopub'
+
+    libraryDescription = 'SDK that This allows you to add CommuteStream ads to your app using MoPub Mediation'
+
+    siteUrl = 'https://github.com/commutestream/cs-android-sdk'
+    gitUrl = 'https://github.com/commutestream/cs-android-sdk.git'
+
+    libraryVersion = '0.8.0'
+
+    developerId = ''
+    developerName = 'CommuteStream'
+    developerEmail = 'support@commutestream.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(':commutestream-sdk')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:25.1.1'
+    testCompile 'junit:junit:4.12'
+    compile('com.mopub:mopub-sdk:4.11.0@aar') {
+        transitive = true
+    }
+}
+
+apply from: '../install.gradle'
+apply from: '../bintray.gradle'
+

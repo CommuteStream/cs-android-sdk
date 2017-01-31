@@ -32,7 +32,7 @@ proguard/
 
 # Android Studio
 .gradle
-sdk/build
+*/build
 /local.properties
 /.idea/workspace.xml
 /.idea/libraries

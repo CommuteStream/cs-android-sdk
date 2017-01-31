@@ -14,6 +14,7 @@ public class AdWebView extends WebView {
 
     @Override
     protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
         Log.d("CS_SDK", "Attached webview, visisble " + getVisibility() + " shown " + isShown());
     }
 }
