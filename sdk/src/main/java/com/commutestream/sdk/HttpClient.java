@@ -73,6 +73,14 @@ class HttpClient implements Client {
                  .addQueryParameter("ad_unit_uuid", adRequest.getAdUnitUuid())
                  .addQueryParameter("timezone", adRequest.getTimezone());
 
+        if(adRequest.isTesting()){
+            urlBuilder.addQueryParameter("testing", "true");
+        }
+
+        if(adRequest.getTheme() != null){
+            urlBuilder.addQueryParameter("theme", adRequest.getTheme());
+        }
+
         Location loc = adRequest.getLocation();
 
         //prevent resending the same location twice
@@ -172,7 +180,8 @@ class HttpClient implements Client {
     }
 
     void retryGetUrl(final String url, final int retryDelay, final int retriesRemaining) {
-        if(retriesRemaining == 0) {
+
+        if(retriesRemaining <= 0) {
             Log.e("CS_SDK", "Failed to send request to " + url);
             return;
         }
