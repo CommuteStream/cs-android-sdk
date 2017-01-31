@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -91,6 +93,12 @@ class HttpClient implements Client {
         if(!agency_interests.isEmpty()) {
             urlBuilder.addQueryParameter("agency_interests", AgencyInterestCSVEncoder.Encode(adRequest.getAgencyInterests()));
         }
+        if(adRequest.isTesting()) {
+            urlBuilder.addQueryParameter("testing", "true");
+        }
+        if(adRequest.isSkipFetch()) {
+            urlBuilder.addQueryParameter("skip_fetch", "true");
+        }
         HttpUrl url = urlBuilder.build();
         Request request = new Request.Builder()
                 .url(url)
@@ -160,13 +168,15 @@ class HttpClient implements Client {
     }
 
     void getUrl(String url) {
-        retryGetUrl(url, 100, 10);
+        retryGetUrl(true, url, 500, 6);
     }
 
-    void retryGetUrl(final String url, final int retryDelay, final int retriesRemaining) {
+    void retryGetUrl(final boolean first, final String url, final int retryDelay, final int retriesRemaining) {
         if(retriesRemaining == 0) {
             Log.e("CS_SDK", "Failed to send request to " + url);
+            return;
         }
+
         Request request = new Request.Builder()
                 .get()
                 .url(url).build();
@@ -174,13 +184,28 @@ class HttpClient implements Client {
             @Override
             public void onFailure(Call call, IOException e) {
                 // retry in a bit in the further in the future with a maximum time between retries
-                retryGetUrl(url, retryDelay*2, retriesRemaining-1);
+                Log.v("CS_SDK", "Request failed, retrying request for " + url + " in " + retryDelay + "ms, " + retriesRemaining + " retries left");
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        retryGetUrl(false, url, retryDelay*2, retriesRemaining-1);
+
+                    }
+                }, retryDelay);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if(!response.isRedirect() && !response.isSuccessful()) {
-                    retryGetUrl(url, retryDelay*2, retriesRemaining-1);
+                    // retry in a bit in the further in the future with a maximum time between retries
+                    Log.v("CS_SDK", "Non-successful HTTP code, Retrying request for " + url + " in " + retryDelay + "ms, " + retriesRemaining + " retries left");
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            retryGetUrl(false, url, retryDelay*2, retriesRemaining-1);
+
+                        }
+                    }, retryDelay);
                 }
             }
         };
