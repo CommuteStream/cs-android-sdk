@@ -168,10 +168,10 @@ class HttpClient implements Client {
     }
 
     void getUrl(String url) {
-        retryGetUrl(true, url, 500, 6);
+        retryGetUrl(url, 500, 6);
     }
 
-    void retryGetUrl(final boolean first, final String url, final int retryDelay, final int retriesRemaining) {
+    void retryGetUrl(final String url, final int retryDelay, final int retriesRemaining) {
         if(retriesRemaining == 0) {
             Log.e("CS_SDK", "Failed to send request to " + url);
             return;
@@ -188,7 +188,7 @@ class HttpClient implements Client {
                 new Timer().schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        retryGetUrl(false, url, retryDelay*2, retriesRemaining-1);
+                        retryGetUrl(url, retryDelay*2, retriesRemaining-1);
 
                     }
                 }, retryDelay);
@@ -202,7 +202,7 @@ class HttpClient implements Client {
                     new Timer().schedule(new TimerTask() {
                         @Override
                         public void run() {
-                            retryGetUrl(false, url, retryDelay*2, retriesRemaining-1);
+                            retryGetUrl(url, retryDelay*2, retriesRemaining-1);
 
                         }
                     }, retryDelay);
