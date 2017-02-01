@@ -1,6 +1,6 @@
 package com.commutestream.sdk;
 
-import static org.assertj.core.api.Assertions.*;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -28,15 +28,15 @@ public class AdRequestTest {
         req.setSkipFetch(true);
         //req.location =
         AdRequest req0 = new AdRequest();
-        assertThat(req.getSdkName()).isEqualTo(req0.getSdkName());
-        assertThat(req.getSdkVersion()).isEqualTo(req0.getSdkVersion());
-        assertThat(req.getAppName()).isEqualTo(req0.getAppName());
-        assertThat(req.getAppVersion()).isEqualTo(req0.getAppVersion());
-        assertThat(req.getAdUnitUuid()).isEqualTo(req0.getAdUnitUuid());
-        assertThat(req.isTesting()).isEqualTo(req0.isTesting());
-        assertThat(req.getViewHeight()).isEqualTo(req0.getViewHeight());
-        assertThat(req.getViewWidth()).isEqualTo(req0.getViewWidth());
-        assertThat(req0.isSkipFetch()).isFalse();
-        assertThat(req0.getAgencyInterests()).isEmpty();
+        Assertions.assertThat(req.getSdkName()).isEqualTo(req0.getSdkName());
+        Assertions.assertThat(req.getSdkVersion()).isEqualTo(req0.getSdkVersion());
+        Assertions.assertThat(req.getAppName()).isEqualTo(req0.getAppName());
+        Assertions.assertThat(req.getAppVersion()).isEqualTo(req0.getAppVersion());
+        Assertions.assertThat(req.getAdUnitUuid()).isEqualTo(req0.getAdUnitUuid());
+        Assertions.assertThat(req.isTesting()).isEqualTo(req0.isTesting());
+        Assertions.assertThat(req.getViewHeight()).isEqualTo(req0.getViewHeight());
+        Assertions.assertThat(req.getViewWidth()).isEqualTo(req0.getViewWidth());
+        Assertions.assertThat(req0.isSkipFetch()).isFalse();
+        Assertions.assertThat(req0.getAgencyInterests()).isEmpty();
     }
 }

@@ -1,6 +1,6 @@
 package com.commutestream.sdk;
 
-import static org.assertj.core.api.Assertions.*;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -17,12 +17,12 @@ public class AgencyInterestTest {
         AgencyInterest aiAgencyVaries = new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "paac", "Red", "12345");
         AgencyInterest aiRouteVaries = new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "cta", "Blue", "12345");
         AgencyInterest aiStopVaries = new AgencyInterest(AgencyInterest.TRACKING_DISPLAYED, "cta", "Red", "54321");
-        assertThat(aiSame).isEqualTo(ai);
-        assertThat(aiNull).isNotEqualTo(ai);
-        assertThat(aiInterestVaries).isNotEqualTo(ai);
-        assertThat(aiAgencyVaries).isNotEqualTo(ai);
-        assertThat(aiRouteVaries).isNotEqualTo(ai);
-        assertThat(aiStopVaries).isNotEqualTo(ai);
+        Assertions.assertThat(aiSame).isEqualTo(ai);
+        Assertions.assertThat(aiNull).isNotEqualTo(ai);
+        Assertions.assertThat(aiInterestVaries).isNotEqualTo(ai);
+        Assertions.assertThat(aiAgencyVaries).isNotEqualTo(ai);
+        Assertions.assertThat(aiRouteVaries).isNotEqualTo(ai);
+        Assertions.assertThat(aiStopVaries).isNotEqualTo(ai);
     }
 
 }

@@ -1,14 +1,8 @@
 package com.commutestream.sdk;
 
-
-import java.util.TimeZone;
 import android.location.Location;
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import android.util.Log;
 
 import java.io.IOException;
 import java.util.Set;
@@ -27,7 +21,7 @@ import okhttp3.ResponseBody;
  * Http Client for CommuteStream Ads
  */
 class HttpClient implements Client {
-    public final static Exception HttpFailure = new Exception("HTTP response was not OK");
+    private final static Exception HttpFailure = new Exception("HTTP response was not OK");
 
     private static String REQUEST_ID_HEADER = "X-CS-REQUEST-ID";
     private static String IMPRESSION_URL_HEADER = "X-CS-IMPRESSION-URL";
@@ -37,8 +31,6 @@ class HttpClient implements Client {
     private static String AD_HEIGHT_HEADER = "X-CS-AD-HEIGHT";
     private Location lastLocationSentConfirmed;
     private Location lastLocationSentAttempted;
-
-    final Logger logger = LoggerFactory.getLogger(HttpLogger.class);
 
     private HttpUrl mBaseURL = new HttpUrl.Builder().scheme("https").host("api.commutestream.com").build();
     private OkHttpClient mClient;
@@ -140,7 +132,10 @@ class HttpClient implements Client {
                             metadata.adWidth = Integer.parseInt(widthStr);
                             metadata.adHeight = Integer.parseInt(heightStr);
                         } else {
-                            logger.debug("CS_SDK", "width and height are " + widthStr + "," + heightStr);
+                            Log.e("CS_SDK", "Null width or height, width: " + widthStr + ", height: " + heightStr);
+                            adHandler.onError(HttpFailure);
+                            body.close();
+                            return;
                         }
                         metadata.viewHeight = adRequest.getViewHeight();
                         metadata.viewWidth = adRequest.getViewWidth();
@@ -175,12 +170,11 @@ class HttpClient implements Client {
         getUrl(metadata.clickUrl);
     }
 
-    void getUrl(String url) {
+    private void getUrl(String url) {
         retryGetUrl(url, 500, 6);
     }
 
-    void retryGetUrl(final String url, final int retryDelay, final int retriesRemaining) {
-
+    private void retryGetUrl(final String url, final int retryDelay, final int retriesRemaining) {
         if(retriesRemaining <= 0) {
             Log.e("CS_SDK", "Failed to send request to " + url);
             return;
@@ -226,5 +220,5 @@ class HttpClient implements Client {
      *
      * @return
      */
-    public HttpUrl getBaseURL() { return mBaseURL; }
+    HttpUrl getBaseURL() { return mBaseURL; }
 }
