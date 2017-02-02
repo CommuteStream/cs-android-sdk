@@ -7,8 +7,6 @@ import android.util.Log;
 
 import java.security.MessageDigest;
 import java.security.SecureRandom;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;

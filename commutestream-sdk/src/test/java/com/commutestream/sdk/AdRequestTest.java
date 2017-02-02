@@ -1,9 +1,13 @@
 package com.commutestream.sdk;
 
-import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 @RunWith(JUnit4.class)
 public class AdRequestTest {
@@ -26,17 +30,16 @@ public class AdRequestTest {
         AdRequest req = mockedRequest();
         req.getAgencyInterests().add(new AgencyInterest(AgencyInterest.FAVORITE_ADDED, "cta", "red", "445"));
         req.setSkipFetch(true);
-        //req.location =
         AdRequest req0 = new AdRequest();
-        Assertions.assertThat(req.getSdkName()).isEqualTo(req0.getSdkName());
-        Assertions.assertThat(req.getSdkVersion()).isEqualTo(req0.getSdkVersion());
-        Assertions.assertThat(req.getAppName()).isEqualTo(req0.getAppName());
-        Assertions.assertThat(req.getAppVersion()).isEqualTo(req0.getAppVersion());
-        Assertions.assertThat(req.getAdUnitUuid()).isEqualTo(req0.getAdUnitUuid());
-        Assertions.assertThat(req.isTesting()).isEqualTo(req0.isTesting());
-        Assertions.assertThat(req.getViewHeight()).isEqualTo(req0.getViewHeight());
-        Assertions.assertThat(req.getViewWidth()).isEqualTo(req0.getViewWidth());
-        Assertions.assertThat(req0.isSkipFetch()).isFalse();
-        Assertions.assertThat(req0.getAgencyInterests()).isEmpty();
+        assertThat(req.getSdkName(), equalTo(req0.getSdkName()));
+        assertThat(req.getSdkVersion(), equalTo(req0.getSdkVersion()));
+        assertThat(req.getAppName(), equalTo(req0.getAppName()));
+        assertThat(req.getAppVersion(), equalTo(req0.getAppVersion()));
+        assertThat(req.getAdUnitUuid(), equalTo(req0.getAdUnitUuid()));
+        assertThat(req.isTesting(), equalTo(req0.isTesting()));
+        assertThat(req.getViewHeight(), equalTo(req0.getViewHeight()));
+        assertThat(req.getViewWidth(), equalTo(req0.getViewWidth()));
+        assertThat(req0.isSkipFetch(), is(false));
+        assertThat(req0.getAgencyInterests(), empty());
     }
 }

@@ -60,12 +60,14 @@ class HttpClient implements Client {
         Set<AgencyInterest> agency_interests = adRequest.getAgencyInterests();
 
          HttpUrl.Builder urlBuilder = mBaseURL.newBuilder("/v2/banner")
-                 .addQueryParameter("session_id", adRequest.getSessionID())
-                 .addQueryParameter("aaid", adRequest.getAAID())
-                 .addQueryParameter("ad_unit_uuid", adRequest.getAdUnitUuid())
+                 .addQueryParameter("session_id", AdRequest.getSessionID())
+                 .addQueryParameter("aaid", AdRequest.getAAID())
+                 .addQueryParameter("ad_unit_uuid", AdRequest.getAdUnitUuid())
                  .addQueryParameter("timezone", adRequest.getTimezone())
-                 .addQueryParameter("width", Integer.toString(adRequest.getViewWidth()))
-                 .addQueryParameter("height", Integer.toString(adRequest.getViewHeight()));
+                 .addQueryParameter("width", Integer.toString(AdRequest.getViewWidth()))
+                 .addQueryParameter("height", Integer.toString(AdRequest.getViewHeight()))
+                 .addQueryParameter("sdk_ver", AdRequest.getSdkVersion())
+                 .addQueryParameter("app_ver", AdRequest.getAppVersion());
 
         if(adRequest.getTheme() != null){
             urlBuilder.addQueryParameter("theme", adRequest.getTheme());
