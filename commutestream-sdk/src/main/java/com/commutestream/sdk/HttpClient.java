@@ -63,11 +63,9 @@ class HttpClient implements Client {
                  .addQueryParameter("session_id", adRequest.getSessionID())
                  .addQueryParameter("aaid", adRequest.getAAID())
                  .addQueryParameter("ad_unit_uuid", adRequest.getAdUnitUuid())
-                 .addQueryParameter("timezone", adRequest.getTimezone());
-
-        if(adRequest.isTesting()){
-            urlBuilder.addQueryParameter("testing", "true");
-        }
+                 .addQueryParameter("timezone", adRequest.getTimezone())
+                 .addQueryParameter("width", Integer.toString(adRequest.getViewWidth()))
+                 .addQueryParameter("height", Integer.toString(adRequest.getViewHeight()));
 
         if(adRequest.getTheme() != null){
             urlBuilder.addQueryParameter("theme", adRequest.getTheme());
@@ -90,15 +88,19 @@ class HttpClient implements Client {
             urlBuilder.addQueryParameter("fix_time", Double.toString(loc.getTime()));
             urlBuilder.addQueryParameter("acc", Double.toString(loc.getAccuracy()));
         }
+
         if(!agency_interests.isEmpty()) {
             urlBuilder.addQueryParameter("agency_interests", AgencyInterestCSVEncoder.Encode(adRequest.getAgencyInterests()));
         }
+
         if(adRequest.isTesting()) {
             urlBuilder.addQueryParameter("testing", "true");
         }
+
         if(adRequest.isSkipFetch()) {
             urlBuilder.addQueryParameter("skip_fetch", "true");
         }
+
         HttpUrl url = urlBuilder.build();
         Request request = new Request.Builder()
                 .url(url)

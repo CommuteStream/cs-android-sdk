@@ -23,8 +23,8 @@ public class AdRequest {
     private static String aaid;
     private static String theme;
     private static String adUnitUuid;
-    private static int viewHeight;
-    private static int viewWidth;
+    private static int viewHeight = 50;
+    private static int viewWidth = 320;
 
     private String timezone;
     private boolean skipFetch = false;
