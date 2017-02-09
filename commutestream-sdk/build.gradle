@@ -16,7 +16,7 @@ ext {
     siteUrl = 'https://github.com/commutestream/cs-android-sdk'
     gitUrl = 'https://github.com/commutestream/cs-android-sdk.git'
 
-    libraryVersion = '0.8.0'
+    libraryVersion = '0.8.1'
 
     developerId = ''
     developerName = 'CommuteStream'
