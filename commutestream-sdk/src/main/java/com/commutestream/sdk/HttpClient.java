@@ -112,7 +112,7 @@ class HttpClient implements Client {
         Callback callback = new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                adHandler.onError(e);
+                adHandler.error(e);
             }
 
             @Override
@@ -137,7 +137,7 @@ class HttpClient implements Client {
                             metadata.adHeight = Integer.parseInt(heightStr);
                         } else {
                             Log.e("CS_SDK", "Null width or height, width: " + widthStr + ", height: " + heightStr);
-                            adHandler.onError(HttpFailure);
+                            adHandler.error(HttpFailure);
                             body.close();
                             return;
                         }
