@@ -7,16 +7,11 @@ import android.util.Log;
 import com.commutestream.sdk.AdController;
 import com.commutestream.sdk.AdHandler;
 import com.commutestream.sdk.CommuteStream;
-import com.google.android.gms.ads.AdRequest;
 import com.mopub.common.DataKeys;
 import com.mopub.mobileads.CustomEventBanner;
 import com.mopub.mobileads.MoPubErrorCode;
 
 import java.util.Map;
-
-/**
- * Created by Sam on 1/20/2017.
- */
 
 public class MoPubBannerAdapter extends CustomEventBanner {
     @Override
