@@ -71,7 +71,7 @@ public class CommuteStream {
      * @return true if initialized, false otherwise
      */
     public synchronized static boolean isInitialized() {
-        return CommuteStream.request.getAdUnitUuid() != null && CommuteStream.request.getAAID() != null;
+        return CommuteStream.request.getAdUnitUuid() != null && CommuteStream.request.getAAID() != null && CommuteStream.request.getLimitTracking() != null;
     }
 
     /**
@@ -192,6 +192,38 @@ public class CommuteStream {
      */
     public static synchronized String getAAID() { return CommuteStream.request.getAAID(); }
 
+    /**
+     * Get the isLimitAdTrackingEnabled from an Android Context and assign it to our singleton. This can only
+     * happen on another thread so we simply spawn one up. This might fail for a wide variety
+     * of reasons.
+     */
+    public static void lookupTrackingEnabled(final Context context) {
+        Thread trackingEnabledRunner = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                CommuteStream.setLimitTracking(ContextUtils.getLimitTracking(context));
+            }
+        });
+        trackingEnabledRunner.start();
+    }
+
+    /**
+     * Set the AAID
+     *
+     * @param aaid
+     */
+    public static synchronized void setLimitTracking(boolean limitTracking) {
+        CommuteStream.request.setLimitTracking(limitTracking);
+        if(isInitialized()) {
+            doPending();
+        }
+    }
+
+
+    /**
+     * Get if tracking is limited
+     */
+    public static synchronized String getLimitTracking() { return CommuteStream.request.getLimitTracking(); }
 
     /**
      * Get the banner height

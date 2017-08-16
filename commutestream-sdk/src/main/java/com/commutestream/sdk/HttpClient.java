@@ -62,6 +62,7 @@ class HttpClient implements Client {
          HttpUrl.Builder urlBuilder = mBaseURL.newBuilder("/v2/banner")
                  .addQueryParameter("session_id", AdRequest.getSessionID())
                  .addQueryParameter("aaid", AdRequest.getAAID())
+                 .addQueryParameter("limit_tracking", AdRequest.getLimitTracking())
                  .addQueryParameter("ad_unit_uuid", AdRequest.getAdUnitUuid())
                  .addQueryParameter("timezone", adRequest.getTimezone())
                  .addQueryParameter("width", Integer.toString(AdRequest.getViewWidth()))

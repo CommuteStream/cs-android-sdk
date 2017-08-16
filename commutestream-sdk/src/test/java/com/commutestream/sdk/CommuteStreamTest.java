@@ -43,8 +43,10 @@ public class CommuteStreamTest  {
         mActivity = Robolectric.buildActivity(Activity.class).create().get();
         CommuteStream.init(mActivity.getApplicationContext(), "testadunit");
         CommuteStream.setAAID("testaaid"); // needed since otherwise it will not be set
+        CommuteStream.setLimitTracking(true); // needed since otherwise it will not be set
         assertThat(CommuteStream.getAdUnitUuid(), is("testadunit"));
         assertThat(CommuteStream.getAAID(), is("testaaid"));
+        assertThat(CommuteStream.getLimitTracking(), is(true));
         assertThat(CommuteStream.isInitialized(), is(true));
         CommuteStream.nextRequest(true); // clear current request if any
     }

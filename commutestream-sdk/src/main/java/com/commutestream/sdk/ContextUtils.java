@@ -39,4 +39,20 @@ public class ContextUtils {
             return null;
         }
     }
+
+    /**
+     * Attempt to get the whether the user has limit ad tracking enabled or not,
+     * returns null and logs on failure
+     * @param context
+     * @return limitTracking
+     */
+    static String getLimitTracking(Context context) {
+        try {
+            return AdvertisingIdClient.getAdvertisingIdInfo(context).
+                    isLimitAdTrackingEnabled();
+        } catch (Exception e) {
+            Log.e("CS_SDK", "Failed to get isLimitAdTrackingEnabled", e);
+            return null;
+        }
+    }
 }
