@@ -46,13 +46,13 @@ public class ContextUtils {
      * @param context
      * @return limitTracking
      */
-    static String getLimitTracking(Context context) {
+    static boolean getLimitTracking(Context context) {
         try {
             return AdvertisingIdClient.getAdvertisingIdInfo(context).
                     isLimitAdTrackingEnabled();
         } catch (Exception e) {
             Log.e("CS_SDK", "Failed to get isLimitAdTrackingEnabled", e);
-            return null;
+            return false;
         }
     }
 }

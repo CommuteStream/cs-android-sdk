@@ -22,6 +22,7 @@ import okhttp3.HttpUrl;
  */
 public class CommuteStream {
 
+    private static boolean initialized = false;
     private static int requestsBeforeInit = 0;
     private static final String version = BuildConfig.VERSION_NAME;
     private static HttpClient httpClient;
@@ -71,7 +72,15 @@ public class CommuteStream {
      * @return true if initialized, false otherwise
      */
     public synchronized static boolean isInitialized() {
-        return CommuteStream.request.getAdUnitUuid() != null && CommuteStream.request.getAAID() != null && CommuteStream.request.getLimitTracking() != null;
+        return initialized;
+    }
+
+    /**
+     * Set the initialized flag to true
+     */
+    public synchronized static void setInitialized() {
+        initialized = true;
+        doPending();
     }
 
     /**
@@ -90,9 +99,6 @@ public class CommuteStream {
      */
     public static synchronized void setAdUnitUuid(String adUnitUuid) {
         CommuteStream.request.setAdUnitUuid(adUnitUuid);
-        if(isInitialized()) {
-            doPending();
-        }
     }
 
     /**
@@ -168,6 +174,8 @@ public class CommuteStream {
             @Override
             public void run() {
                 CommuteStream.setAAID(ContextUtils.getAAID(context));
+                CommuteStream.setLimitTracking(ContextUtils.getLimitTracking(context));
+                CommuteStream.setInitialized();
             }
         });
         aaidRunner.start();
@@ -193,37 +201,18 @@ public class CommuteStream {
     public static synchronized String getAAID() { return CommuteStream.request.getAAID(); }
 
     /**
-     * Get the isLimitAdTrackingEnabled from an Android Context and assign it to our singleton. This can only
-     * happen on another thread so we simply spawn one up. This might fail for a wide variety
-     * of reasons.
-     */
-    public static void lookupTrackingEnabled(final Context context) {
-        Thread trackingEnabledRunner = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                CommuteStream.setLimitTracking(ContextUtils.getLimitTracking(context));
-            }
-        });
-        trackingEnabledRunner.start();
-    }
-
-    /**
      * Set the AAID
      *
-     * @param aaid
+     * @param limitTracking
      */
     public static synchronized void setLimitTracking(boolean limitTracking) {
         CommuteStream.request.setLimitTracking(limitTracking);
-        if(isInitialized()) {
-            doPending();
-        }
     }
-
 
     /**
      * Get if tracking is limited
      */
-    public static synchronized String getLimitTracking() { return CommuteStream.request.getLimitTracking(); }
+    public static synchronized boolean getLimitTracking() { return CommuteStream.request.getLimitTracking(); }
 
     /**
      * Get the banner height

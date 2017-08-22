@@ -20,7 +20,7 @@ class AdRequest {
     private static String sdkVersion;
     private static String sessionID;
     private static String aaid;
-    private static String limitTracking;
+    private static boolean limitTracking;
     private static String theme;
     private static String adUnitUuid;
     private static int viewHeight = 50;
@@ -88,7 +88,7 @@ class AdRequest {
     }
 
 
-    static String getLimitTracking() {
+    static boolean getLimitTracking() {
         return limitTracking;
     }
 

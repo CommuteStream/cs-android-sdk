@@ -44,6 +44,7 @@ public class CommuteStreamTest  {
         CommuteStream.init(mActivity.getApplicationContext(), "testadunit");
         CommuteStream.setAAID("testaaid"); // needed since otherwise it will not be set
         CommuteStream.setLimitTracking(true); // needed since otherwise it will not be set
+        CommuteStream.setInitialized();
         assertThat(CommuteStream.getAdUnitUuid(), is("testadunit"));
         assertThat(CommuteStream.getAAID(), is("testaaid"));
         assertThat(CommuteStream.getLimitTracking(), is(true));
