@@ -27,6 +27,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -162,5 +163,11 @@ public class CommuteStreamTest  {
         assertThat(CommuteStream.getRequest().getAgencyInterests(), hasNoDuplicates(AgencyInterest.class));
         CommuteStream.addAgencyInterest(dupe);
         assertThat(CommuteStream.getRequest().getAgencyInterests(), hasNoDuplicates(AgencyInterest.class));
+    }
+
+    @Test
+    public void disableAutomaticTracking() {
+        CommuteStream.setAutomaticLocationTracking(false);
+        assertThat(CommuteStream.getDeviceLocation(null), nullValue());
     }
 }

@@ -23,6 +23,7 @@ import okhttp3.HttpUrl;
 public class CommuteStream {
 
     private static boolean initialized = false;
+    private static boolean automaticLocationTracking = true;
     private static int requestsBeforeInit = 0;
     private static final String version = BuildConfig.VERSION_NAME;
     private static HttpClient httpClient;
@@ -45,6 +46,18 @@ public class CommuteStream {
         CommuteStream.setAppVersion(ContextUtils.getAppVersion(context));
         CommuteStream.setAdUnitUuid(adUnit);
         CommuteStream.lookupAAID(context);
+    }
+
+    /**
+     * Set the automatic device tracking flag
+     *
+     * Set to true if you would like CommuteStream to automatically get the most recent
+     * location found by location services and send it with each request.
+     *
+     * Set to false if you would like to completely disable this functionality.
+     */
+    public synchronized static void setAutomaticLocationTracking(boolean automatic) {
+        automaticLocationTracking = automatic;
     }
 
     /**
@@ -452,19 +465,31 @@ public class CommuteStream {
     }
 
     /**
+     * Try to automatically determine device location
+     *
+     * @param context Android context
+     * @return location of device if available, null otherwise
+     */
+    public static Location getDeviceLocation(Context context) {
+        if(automaticLocationTracking) {
+            return DeviceLocation.getBestLocation(context);
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * Get an Ad for display
      *
      * @param handler response handler
      */
     public static synchronized void getAd(final Context context, final AdHandler handler, final AdEventListener listener) {
-
-        //try grabbing a new location to send - if we have one set it for delivery
-        Location newLocation = DeviceLocation.getBestLocation(context);
-        if(newLocation != null){
-            setLocation(newLocation);
-        }
-
         if(isInitialized()) {
+            //try grabbing a new location to send - if we have one set it for delivery
+            Location newLocation = getDeviceLocation(context);
+            if(newLocation != null){
+                setLocation(newLocation);
+            }
             clearPending();
             doGetAd(context, nextRequest(true), handler, listener);
         } else {

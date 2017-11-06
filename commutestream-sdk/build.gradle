@@ -28,13 +28,13 @@ ext {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
     defaultConfig {
         versionCode 800
         versionName libraryVersion
-        minSdkVersion 14
-        targetSdkVersion 25
+        minSdkVersion 16
+        targetSdkVersion 26
         testApplicationId "com.commutestream.sdk.test"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -51,7 +51,7 @@ android {
 }
 
 dependencies {
-    compile 'com.google.firebase:firebase-ads:10.0.1'
+    compile 'com.google.android.gms:play-services-ads:11.4.2'
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
     testCompile 'org.robolectric:robolectric:3.2.2'
     testCompile "junit:junit:4.12"
